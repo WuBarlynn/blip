@@ -6,8 +6,8 @@
   "description": "Blip Cloudflare Worker — Cloudflare-native monitoring mode. One Worker runs checks on a Cron Trigger, stores results in D1, and serves the dashboard + /data/*.json API.",
   "scripts": {
     "gen-config": "node scripts/gen-config.mjs",
-    "build": "npm run build --workspace @blip/dashboard && npm run gen-config && wrangler deploy --dry-run --outdir dist",
-    "deploy": "npm run build --workspace @blip/dashboard && npm run gen-config && wrangler deploy",
+    "build": "npm ci --prefix \"$npm_config_local_prefix\" --workspace @blip/dashboard && npm run build --workspace @blip/dashboard && npm run gen-config && wrangler deploy --dry-run --outdir dist",
+    "deploy": "npm ci --prefix \"$npm_config_local_prefix\" --workspace @blip/dashboard && npm run build --workspace @blip/dashboard && npm run gen-config && wrangler deploy",
     "dev": "npm run gen-config && wrangler dev",
     "db:schema": "wrangler d1 execute blip-db --file=schema.sql",
     "test": "vitest run",
