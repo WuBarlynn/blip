@@ -53,7 +53,7 @@ crons = ["*/5 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "blip-db"
-database_id = "PLACEHOLDER_SET_AT_DEPLOY"
+database_id = "b597bd1c-e81e-484d-8be3-bd027a8599a4"
 
 # Static dashboard assets. The dashboard is a built SPA; unknown routes fall
 # back to index.html so client-side routing works. The Worker's own fetch()
