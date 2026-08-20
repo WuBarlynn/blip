@@ -28,19 +28,19 @@
 #  /data/incidents.json — all served from D1 by this same Worker.
 # ============================================================================
 
-name = "blip-worker"
+name = "blip"
 main = "src/index.ts"
-compatibility_date = "2024-11-01"
+compatibility_date = "2026-08-20"
 # nodejs_compat is required for any node-style globals the bundle may touch and
 # is the supported way to enable Node built-in shims on Workers.
 compatibility_flags = ["nodejs_compat"]
-workers_dev = true
+workers_dev = false
+preview_urls = false
 
 # Custom domain — Cloudflare creates/owns the DNS record + cert pointing the
 # hostname at this Worker (requires no conflicting `blip` CNAME to pre-exist).
 routes = [
-  # Patched at deploy time by `npm run deploy:cloud` (or edit by hand).
-  { pattern = "status.example.com", custom_domain = true }
+  { pattern = "status.wubarlynn.top", custom_domain = true }
 ]
 
 # Run the checks every 5 minutes.
