@@ -53,12 +53,14 @@ sites:
     description: Cloud Mail Worker.
 
   - name: XGS星光服
-    url: mc.xingguang.space
-    type: tcp
-    port: 39191
+    url: https://mcstatus-probe.wubarlynn.top/get_motd
     group: xgs
     public: true
-    description: Minecraft server TCP port.
+    expectedStatus: 200
+    expectJson:
+      - path: status
+        equals: online
+    description: Minecraft MOTD status probe.
 
 access:
   publicStatusPage: true
