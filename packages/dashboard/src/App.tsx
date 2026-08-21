@@ -43,9 +43,9 @@ function RequireAuth({ children, allowPublic = false }: { children: ReactNode; a
  * publishes a public status page, or to anyone authenticated. Otherwise the
  * LoginScreen is shown.
  */
-function PublicStatus({ groupId }: { groupId?: string }) {
+function PublicStatus({ groupId, requireLogin = false }: { groupId?: string; requireLogin?: boolean }) {
   const { authenticated, publicStatusPage } = useAuth();
-  if (!publicStatusPage && !authenticated) return <LoginScreen />;
+  if ((!publicStatusPage || requireLogin) && !authenticated) return <LoginScreen />;
   return <Status groupId={groupId} />;
 }
 
@@ -56,7 +56,7 @@ export default function App() {
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             {/* Public status pages — standalone minimal layout, no sidebar. */}
-            <Route path="/status/wubarlynn" element={<PublicStatus />} />
+            <Route path="/status/wubarlynn" element={<PublicStatus requireLogin />} />
             <Route path="/status/xgs" element={<PublicStatus groupId="xgs" />} />
             <Route path="/status" element={<NotFound />} />
 
