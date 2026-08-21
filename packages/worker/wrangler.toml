@@ -65,7 +65,7 @@ not_found_handling = "single-page-application"
 # Run the Worker BEFORE static assets for the data API, so /data/* is served
 # from D1 (live) and never shadowed by any bundled JSON. Other paths are served
 # directly from assets.
-run_worker_first = ["/data/*", "/auth/*"]
+run_worker_first = ["/data/*", "/auth/*", "/bot/*"]
 
 # Optional: how often (hours) to refresh the slow/rate-limited SSL + domain
 # probes. Defaults to 6h in code when unset.
