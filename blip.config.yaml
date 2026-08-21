@@ -22,21 +22,21 @@ groups:
 
 sites:
   - name: Blip Status
-    url: https://blipstatus.wubarlynn.top
+    url: https://status.wubarlynn.top
     group: wubarlynn
     public: true
     ssl: true
     description: Blip monitoring status page.
 
   - name: Discourse Monitor
-    url: https://discourse-monitor.wubarlynn.top
+    url: https://discourse-monitor.wubarlynn.top/login
     group: wubarlynn
     public: true
     ssl: true
     description: Discourse monitoring Worker.
 
-  - name: WoeGotify
-    url: https://woegotify.wubarlynn.top
+  - name: Gotify
+    url: https://gotify.wubarlynn.top
     group: wubarlynn
     public: true
     ssl: true
