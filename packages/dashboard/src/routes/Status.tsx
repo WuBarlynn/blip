@@ -136,34 +136,38 @@ export default function Status({ groupId }: { groupId?: string }) {
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
           <Logo name={brandName} logoUrl={brand?.logoUrl} />
           <div className="flex items-center gap-1">
-            {brand?.website && (
-              <a
-                href={brand.website}
-                target="_blank"
-                rel="noreferrer"
-                className="hidden items-center gap-1 text-sm text-muted-foreground hover:text-primary sm:inline-flex"
-              >
-                Website <ExternalLink className="size-3.5" />
-              </a>
-            )}
-            {auth.authenticated ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => void auth.logout()}
-                className="text-muted-foreground"
-              >
-                <LogOut className="size-3.5" /> Sign out
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowLogin(true)}
-                className="text-muted-foreground"
-              >
-                <LogIn className="size-3.5" /> Sign in
-              </Button>
+            {!isXgs && (
+              <>
+                {brand?.website && (
+                  <a
+                    href={brand.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hidden items-center gap-1 text-sm text-muted-foreground hover:text-primary sm:inline-flex"
+                  >
+                    Website <ExternalLink className="size-3.5" />
+                  </a>
+                )}
+                {auth.authenticated ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void auth.logout()}
+                    className="text-muted-foreground"
+                  >
+                    <LogOut className="size-3.5" /> Sign out
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowLogin(true)}
+                    className="text-muted-foreground"
+                  >
+                    <LogIn className="size-3.5" /> Sign in
+                  </Button>
+                )}
+              </>
             )}
             <ThemeToggle />
           </div>
