@@ -43,6 +43,7 @@ import { iso, MS_PER_DAY, MS_PER_HOUR } from "./time.js";
 
 const POINTS_RETENTION_MS = 90 * MS_PER_DAY;
 const DEFAULT_SSL_REFRESH_HOURS = 6;
+const PROBE_INTERVAL_MS = 10 * 60 * 1000;
 
 // ---------------------------------------------------------------------------
 // scheduled
@@ -82,9 +83,12 @@ async function runChecks(env: Env, now: number): Promise<void> {
         version: loaded.version ?? 1,
         sites: loaded.sites ?? {},
         alerts: loaded.alerts ?? {},
+        ...(loaded.lastProbeAt ? { lastProbeAt: loaded.lastProbeAt } : {}),
         ...(loaded.updatedAt ? { updatedAt: loaded.updatedAt } : {}),
       }
     : { ...EMPTY_STATE, sites: {}, alerts: {} };
+
+  if (state.lastProbeAt && now - state.lastProbeAt < PROBE_INTERVAL_MS) return;
 
   const results = new Map<string, SiteResult>();
 
@@ -202,6 +206,7 @@ async function runChecks(env: Env, now: number): Promise<void> {
   }
 
   // 6. Persist state.
+  nextState.lastProbeAt = now;
   nextState.updatedAt = iso(now);
   await setKv(db, "state", nextState);
 }
