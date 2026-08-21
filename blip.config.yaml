@@ -21,13 +21,6 @@ groups:
     description: Cloudflare Workers and hosted services.
 
 sites:
-  - name: Blip Status
-    url: https://status.wubarlynn.top
-    group: wubarlynn
-    public: true
-    ssl: true
-    description: Blip monitoring status page.
-
   - name: Discourse Monitor
     url: https://discourse-monitor.wubarlynn.top
     group: wubarlynn
