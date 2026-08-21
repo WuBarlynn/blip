@@ -119,7 +119,9 @@ export default function Status({ groupId }: { groupId?: string }) {
   );
 
   const brand = data?.brand;
-  const brandName = brand?.name?.trim() || "Blip";
+  const isXgs = groupId === "xgs";
+  const brandName = isXgs ? "XGS服务器状态" : brand?.name?.trim() || "Blip";
+  const tagline = isXgs ? undefined : brand?.tagline;
 
   // The Worker returned 401 for /data/summary.json (status page not public and
   // viewer not logged in) or the viewer asked to sign in → show the login card.
@@ -187,9 +189,9 @@ export default function Status({ groupId }: { groupId?: string }) {
               {/* Hero */}
               <div className="text-center">
                 <h1 className="text-3xl font-bold tracking-tight">{brandName} Status</h1>
-                {brand?.tagline && (
+                {tagline && (
                   <p className="mx-auto mt-2 max-w-xl text-balance text-muted-foreground">
-                    {brand.tagline}
+                    {tagline}
                   </p>
                 )}
               </div>
