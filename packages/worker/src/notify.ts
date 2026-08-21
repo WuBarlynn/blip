@@ -62,17 +62,20 @@ function humanizeMs(ms: number): string {
 }
 
 export function napcatText(e: NotifyEvent): string {
-  const status =
-    e.type === "up"
-      ? "服务正常"
-      : e.type === "down"
-        ? "服务不可用"
-        : e.type === "degraded"
-          ? "服务响应缓慢"
-          : e.type === "ssl"
-            ? "TLS 证书即将过期"
-            : "域名即将过期";
-  return `${e.siteName}：${status}`;
+  switch (e.type) {
+    case "down":
+      return `🔴 ${e.siteName} is DOWN`;
+    case "up": {
+      const dur = e.durationMs !== undefined ? ` after ${humanizeMs(e.durationMs)}` : "";
+      return `✅ ${e.siteName} recovered${dur}`;
+    }
+    case "degraded":
+      return `🟡 ${e.siteName} is DEGRADED`;
+    case "ssl":
+      return `🔐 ${e.siteName} — TLS certificate expires in ${e.ssl?.daysRemaining ?? "?"} days`;
+    case "domain":
+      return `🌐 ${e.siteName} — domain expires in ${e.domain?.daysRemaining ?? "?"} days`;
+  }
 }
 
 export function plainText(e: NotifyEvent): string {
