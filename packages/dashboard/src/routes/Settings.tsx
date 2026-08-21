@@ -32,6 +32,7 @@ const CHANNEL_ICON: Record<ChannelType, typeof Send> = {
   webhook: Webhook,
   bark: Smartphone,
   gotify: Bell,
+  napcat: MessageSquare,
 };
 
 /**
@@ -54,6 +55,7 @@ function useDerivedChannels(): { type: ChannelType; label: string }[] {
       { type: "webhook", label: "Webhook" },
       { type: "bark", label: "Bark" },
       { type: "gotify", label: "Gotify" },
+      { type: "napcat", label: "NapCat" },
     ],
     [],
   );

@@ -204,6 +204,19 @@ async function sendChannel(
         { headers: { "x-gotify-key": token } },
       );
     }
+    case "napcat": {
+      const url = resolveRef(channel.apiUrl, env);
+      const token = resolveRef(channel.accessToken, env);
+      const groupId = resolveRef(channel.groupId, env);
+      if (unresolved(url) || unresolved(token) || unresolved(groupId)) {
+        return { ok: false, error: "missing NapCat api url/token/group id" };
+      }
+      return post(
+        url,
+        { group_id: Number(groupId), message: `状态：${event.type}\n${text}` },
+        { headers: { authorization: `Bearer ${token}` } },
+      );
+    }
     default: {
       const _never: never = channel;
       return { ok: false, error: `unknown channel ${String(_never)}` };

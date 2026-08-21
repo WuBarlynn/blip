@@ -86,3 +86,11 @@ channels:
     token: ${GOTIFY_TOKEN}
     priority: 5
     events: [down, up]
+
+  - id: napcat-xgs
+    type: napcat
+    apiUrl: ${NAPCAT_API_URL}
+    accessToken: ${NAPCAT_ACCESS_TOKEN}
+    groupId: ${NAPCAT_GROUP_ID}
+    sites: [xgs]
+    events: [down, up]

@@ -35,7 +35,7 @@ import {
 } from "./checks.js";
 import type { Env } from "./env.js";
 import { reconcile, type SiteResult } from "./incidents.js";
-import { dispatchNotifications } from "./notify.js";
+import { dispatchNotifications, plainText, type NotifyEvent } from "./notify.js";
 import { EMPTY_STATE, siteStateFor, type WorkerState } from "./state.js";
 import { appendPoint, getKv, prunePoints, setKv } from "./store.js";
 import { buildSiteHistory, buildSummary } from "./summary.js";
@@ -299,6 +299,52 @@ export default {
       const res = jsonAuth({ authenticated: false });
       res.headers.append("set-cookie", clearCookie());
       return res;
+    }
+
+    // --- NapCat OneBot HTTP event callback ---
+    if (path === "/bot/napcat") {
+      if (request.method !== "POST") return jsonAuth({ error: "method not allowed" }, 405);
+      const token = env.NAPCAT_EVENT_TOKEN;
+      if (!token || request.headers.get("authorization") !== `Bearer ${token}`) {
+        return jsonAuth({ error: "unauthorized" }, 401);
+      }
+      let event: { post_type?: string; message_type?: string; group_id?: number; raw_message?: string };
+      try {
+        event = (await request.json()) as typeof event;
+      } catch {
+        return jsonAuth({ error: "invalid JSON" }, 400);
+      }
+      const groupId = String(env.NAPCAT_GROUP_ID ?? "");
+      if (
+        event.post_type !== "message" ||
+        event.message_type !== "group" ||
+        String(event.group_id) !== groupId ||
+        event.raw_message?.trim() !== "状态"
+      ) {
+        return jsonAuth({ ok: true });
+      }
+      const summary = await getKv<Summary>(env.DB, "blob:summary");
+      const site = summary?.sites.find((candidate) => candidate.id === "xgs");
+      const apiUrl = env.NAPCAT_API_URL;
+      const apiToken = env.NAPCAT_ACCESS_TOKEN;
+      if (!site || !apiUrl || !apiToken) return jsonAuth({ error: "server misconfigured" }, 500);
+      const statusEvent: NotifyEvent = {
+        type: site.status === "up" ? "up" : "down",
+        siteId: site.id,
+        siteName: site.name,
+        url: site.url,
+        group: site.group,
+        status: site.status,
+        detail: site.error,
+        at: new Date().toISOString(),
+      };
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${apiToken}` },
+        body: JSON.stringify({ group_id: Number(groupId), message: `状态：${statusEvent.type}\n${plainText(statusEvent)}` }),
+      });
+      if (!res.ok) return jsonAuth({ error: "NapCat request failed" }, 502);
+      return jsonAuth({ ok: true });
     }
 
     // --- data API (RBAC-filtered) ---

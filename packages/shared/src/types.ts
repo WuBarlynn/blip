@@ -32,7 +32,7 @@ export type IncidentState = "open" | "resolved";
 export type Role = "SUPER_ADMIN" | "ADMIN" | "CLIENT" | "VIEWER";
 
 /** Supported notification channel kinds. */
-export type ChannelType = "telegram" | "email" | "discord" | "slack" | "webhook" | "bark" | "gotify";
+export type ChannelType = "telegram" | "email" | "discord" | "slack" | "webhook" | "bark" | "gotify" | "napcat";
 
 // ---------------------------------------------------------------------------
 // Configuration (user-authored, parsed from blip.config.yaml)
@@ -214,6 +214,19 @@ export interface GotifyChannel {
   minDownMinutes?: number;
 }
 
+/** NapCat / OneBot group-message channel. */
+export interface NapCatChannel {
+  id: string;
+  type: "napcat";
+  apiUrl: string;
+  accessToken: string;
+  groupId: string;
+  events?: EventType[];
+  sites?: string[];
+  groups?: string[];
+  minDownMinutes?: number;
+}
+
 export type ChannelConfig =
   | TelegramChannel
   | EmailChannel
@@ -221,7 +234,8 @@ export type ChannelConfig =
   | SlackChannel
   | WebhookChannel
   | BarkChannel
-  | GotifyChannel;
+  | GotifyChannel
+  | NapCatChannel;
 
 /** Branding / appearance for the dashboard + status page. */
 export interface BrandConfig {
