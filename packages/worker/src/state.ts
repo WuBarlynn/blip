@@ -47,8 +47,6 @@ export interface WorkerState {
   version: number;
   sites: Record<string, SiteState>;
   alerts?: AlertLedger;
-  /** Epoch ms of the last full site probe run. */
-  lastProbeAt?: number;
   updatedAt?: string;
 }
 
