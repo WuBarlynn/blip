@@ -305,17 +305,32 @@ export default {
     if (path === "/bot/napcat") {
       if (request.method !== "POST") return jsonAuth({ error: "method not allowed" }, 405);
       const token = env.NAPCAT_EVENT_TOKEN;
+      const body = await request.text();
       const authorization = request.headers.get("authorization");
       const provided =
         authorization?.replace(/^Bearer\s+/i, "") ??
         request.headers.get("x-self-token") ??
         request.headers.get("access-token");
-      if (!token || provided !== token) {
+      const signature = request.headers.get("x-signature");
+      let signatureMatches = false;
+      if (token && signature?.startsWith("sha1=")) {
+        const key = await crypto.subtle.importKey(
+          "raw",
+          new TextEncoder().encode(token),
+          { name: "HMAC", hash: "SHA-1" },
+          false,
+          ["sign"],
+        );
+        const bytes = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body)));
+        const expected = [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        signatureMatches = signature.slice(5) === expected;
+      }
+      if (!token || (provided !== token && !signatureMatches)) {
         return jsonAuth({ error: "unauthorized" }, 401);
       }
       let event: { post_type?: string; message_type?: string; group_id?: number; raw_message?: string };
       try {
-        event = (await request.json()) as typeof event;
+        event = JSON.parse(body) as typeof event;
       } catch {
         return jsonAuth({ error: "invalid JSON" }, 400);
       }
