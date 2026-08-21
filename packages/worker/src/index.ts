@@ -305,7 +305,12 @@ export default {
     if (path === "/bot/napcat") {
       if (request.method !== "POST") return jsonAuth({ error: "method not allowed" }, 405);
       const token = env.NAPCAT_EVENT_TOKEN;
-      if (!token || request.headers.get("authorization") !== `Bearer ${token}`) {
+      const authorization = request.headers.get("authorization");
+      const provided =
+        authorization?.replace(/^Bearer\s+/i, "") ??
+        request.headers.get("x-self-token") ??
+        request.headers.get("access-token");
+      if (!token || provided !== token) {
         return jsonAuth({ error: "unauthorized" }, 401);
       }
       let event: { post_type?: string; message_type?: string; group_id?: number; raw_message?: string };
