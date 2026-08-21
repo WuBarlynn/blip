@@ -61,6 +61,20 @@ function humanizeMs(ms: number): string {
   return `${h}h ${m % 60}m`;
 }
 
+export function napcatText(e: NotifyEvent): string {
+  const status =
+    e.type === "up"
+      ? "服务正常"
+      : e.type === "down"
+        ? "服务不可用"
+        : e.type === "degraded"
+          ? "服务响应缓慢"
+          : e.type === "ssl"
+            ? "TLS 证书即将过期"
+            : "域名即将过期";
+  return `${e.siteName}：${status}`;
+}
+
 export function plainText(e: NotifyEvent): string {
   const emoji = EMOJI[e.type];
   const lines: string[] = [];
@@ -213,7 +227,7 @@ async function sendChannel(
       }
       return post(
         url,
-        { group_id: Number(groupId), message: `状态：${event.type}\n${text}` },
+        { group_id: Number(groupId), message: napcatText(event) },
         { headers: { authorization: `Bearer ${token}` } },
       );
     }
