@@ -43,10 +43,10 @@ function RequireAuth({ children, allowPublic = false }: { children: ReactNode; a
  * publishes a public status page, or to anyone authenticated. Otherwise the
  * LoginScreen is shown.
  */
-function PublicStatus() {
+function PublicStatus({ groupId }: { groupId?: string }) {
   const { authenticated, publicStatusPage } = useAuth();
   if (!publicStatusPage && !authenticated) return <LoginScreen />;
-  return <Status />;
+  return <Status groupId={groupId} />;
 }
 
 export default function App() {
@@ -55,8 +55,10 @@ export default function App() {
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
-            {/* Public status page — standalone minimal layout, no sidebar. */}
-            <Route path="/status" element={<PublicStatus />} />
+            {/* Public status pages — standalone minimal layout, no sidebar. */}
+            <Route path="/status/wubarlynn" element={<PublicStatus />} />
+            <Route path="/status/xgs" element={<PublicStatus groupId="xgs" />} />
+            <Route path="/status" element={<NotFound />} />
 
             {/* Dashboard shell. Read-only routes allow anonymous viewers when
                 `publicDashboard` is on; Settings always requires a login. */}

@@ -33,7 +33,7 @@ const NAV: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/sites", label: "Sites", icon: ListChecks },
   { to: "/incidents", label: "Incidents", icon: AlertOctagon },
-  { to: "/status", label: "Status page", icon: Globe },
+  { to: "/status/wubarlynn", label: "Status page", icon: Globe },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -69,7 +69,7 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
         >
           <Icon className="size-4" />
           {label}
-          {to === "/status" && <ExternalLink className="ml-auto size-3.5 opacity-60" />}
+          {to === "/status/wubarlynn" && <ExternalLink className="ml-auto size-3.5 opacity-60" />}
         </NavLink>
       ))}
     </nav>

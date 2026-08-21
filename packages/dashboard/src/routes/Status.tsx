@@ -75,15 +75,18 @@ function GroupSection({
   );
 }
 
-export default function Status() {
+export default function Status({ groupId }: { groupId?: string }) {
   const { data, error, loading, reload, unauthorized } = useSummary();
   const auth = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   useBrand(data?.brand);
 
   const publicSites = useMemo(
-    () => (data ? data.sites.filter((s) => s.public !== false) : []),
-    [data],
+    () =>
+      data
+        ? data.sites.filter((s) => s.public !== false && (!groupId || s.group === groupId))
+        : [],
+    [data, groupId],
   );
 
   const overall = useMemo(

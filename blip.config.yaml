@@ -19,6 +19,9 @@ groups:
   - id: wubarlynn
     name: WuBarlynn Services
     description: Cloudflare Workers and hosted services.
+  - id: xgs
+    name: XGS
+    description: XGS Minecraft server.
 
 sites:
   - name: Discourse Monitor
@@ -49,11 +52,11 @@ sites:
     ssl: true
     description: Cloud Mail Worker.
 
-  - name: XGS星光服生电
+  - name: XGS星光服
     url: mc.xingguang.space
     type: tcp
     port: 39191
-    group: wubarlynn
+    group: xgs
     public: true
     description: Minecraft server TCP port.
 
