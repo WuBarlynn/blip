@@ -50,16 +50,12 @@ sites:
     description: Cloud Mail Worker.
 
   - name: XGS星光服生电
-    url: http://47.94.242.99:16767/api/server
+    url: mc.xingguang.space
+    type: tcp
+    port: 39191
     group: wubarlynn
     public: true
-    headers:
-      Authorization: "Bearer ${XGS_API_TOKEN}"
-    expectedStatus: 200
-    expectJson:
-      - path: server_port
-        equals: 9191
-    description: XGS game server API.
+    description: Minecraft server TCP port.
 
 access:
   publicStatusPage: true
