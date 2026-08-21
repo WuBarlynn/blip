@@ -62,20 +62,27 @@ function humanizeMs(ms: number): string {
 }
 
 export function napcatText(e: NotifyEvent): string {
+  let detail: string;
   switch (e.type) {
     case "down":
-      return `🔴 ${e.siteName} is DOWN`;
+      detail = `🔴 ${e.siteName} is DOWN`;
+      break;
     case "up": {
       const dur = e.durationMs !== undefined ? ` after ${humanizeMs(e.durationMs)}` : "";
-      return `✅ ${e.siteName} recovered${dur}`;
+      detail = `✅ ${e.siteName} recovered${dur}`;
+      break;
     }
     case "degraded":
-      return `🟡 ${e.siteName} is DEGRADED`;
+      detail = `🟡 ${e.siteName} is DEGRADED`;
+      break;
     case "ssl":
-      return `🔐 ${e.siteName} — TLS certificate expires in ${e.ssl?.daysRemaining ?? "?"} days`;
+      detail = `🔐 ${e.siteName} — TLS certificate expires in ${e.ssl?.daysRemaining ?? "?"} days`;
+      break;
     case "domain":
-      return `🌐 ${e.siteName} — domain expires in ${e.domain?.daysRemaining ?? "?"} days`;
+      detail = `🌐 ${e.siteName} — domain expires in ${e.domain?.daysRemaining ?? "?"} days`;
+      break;
   }
+  return `服务器状态：${e.siteName}\n状态：${e.type}\n${detail}`;
 }
 
 export function plainText(e: NotifyEvent): string {
