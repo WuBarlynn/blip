@@ -32,7 +32,7 @@ export type IncidentState = "open" | "resolved";
 export type Role = "SUPER_ADMIN" | "ADMIN" | "CLIENT" | "VIEWER";
 
 /** Supported notification channel kinds. */
-export type ChannelType = "telegram" | "email" | "discord" | "slack" | "webhook";
+export type ChannelType = "telegram" | "email" | "discord" | "slack" | "webhook" | "bark" | "gotify";
 
 // ---------------------------------------------------------------------------
 // Configuration (user-authored, parsed from blip.config.yaml)
@@ -190,12 +190,38 @@ export interface WebhookChannel {
   minDownMinutes?: number;
 }
 
+/** Bark notification channel. */
+export interface BarkChannel {
+  id: string;
+  type: "bark";
+  url: string;
+  events?: EventType[];
+  sites?: string[];
+  groups?: string[];
+  minDownMinutes?: number;
+}
+
+/** Gotify notification channel. */
+export interface GotifyChannel {
+  id: string;
+  type: "gotify";
+  url: string;
+  token: string;
+  priority?: number;
+  events?: EventType[];
+  sites?: string[];
+  groups?: string[];
+  minDownMinutes?: number;
+}
+
 export type ChannelConfig =
   | TelegramChannel
   | EmailChannel
   | DiscordChannel
   | SlackChannel
-  | WebhookChannel;
+  | WebhookChannel
+  | BarkChannel
+  | GotifyChannel;
 
 /** Branding / appearance for the dashboard + status page. */
 export interface BrandConfig {

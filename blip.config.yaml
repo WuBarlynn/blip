@@ -29,7 +29,7 @@ sites:
     description: Blip monitoring status page.
 
   - name: Discourse Monitor
-    url: https://discourse-monitor.wubarlynn.top/login
+    url: https://discourse-monitor.wubarlynn.top
     group: wubarlynn
     public: true
     ssl: true
@@ -56,6 +56,18 @@ sites:
     ssl: true
     description: Cloud Mail Worker.
 
+  - name: XGS星光服生电
+    url: http://47.94.242.99:16767/api/server
+    group: wubarlynn
+    public: true
+    headers:
+      Authorization: "Bearer ${XGS_API_TOKEN}"
+    expectedStatus: 200
+    expectJson:
+      - path: server_port
+        equals: 9191
+    description: XGS game server API.
+
 access:
   publicStatusPage: true
   publicDashboard: false
@@ -65,4 +77,20 @@ access:
       role: ADMIN
       password: ${BLIP_PW_ADMIN}
 
-channels: []
+channels:
+  - id: bark-12mini
+    type: bark
+    url: ${BARK_12MINI_URL}
+    events: [down, up]
+
+  - id: bark-macbookair
+    type: bark
+    url: ${BARK_MACBOOKAIR_URL}
+    events: [down, up]
+
+  - id: gotify
+    type: gotify
+    url: https://gotify.wubarlynn.top/message
+    token: ${GOTIFY_TOKEN}
+    priority: 5
+    events: [down, up]

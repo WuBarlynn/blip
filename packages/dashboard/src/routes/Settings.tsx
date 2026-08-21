@@ -10,6 +10,7 @@ import {
   Mail,
   MessageSquare,
   Webhook,
+  Smartphone,
 } from "lucide-react";
 import type { ChannelType, Role } from "@blip/shared";
 import { useSummary } from "@/lib/data";
@@ -29,6 +30,8 @@ const CHANNEL_ICON: Record<ChannelType, typeof Send> = {
   discord: MessageSquare,
   slack: MessageSquare,
   webhook: Webhook,
+  bark: Smartphone,
+  gotify: Bell,
 };
 
 /**
@@ -49,6 +52,8 @@ function useDerivedChannels(): { type: ChannelType; label: string }[] {
       { type: "discord", label: "Discord" },
       { type: "slack", label: "Slack" },
       { type: "webhook", label: "Webhook" },
+      { type: "bark", label: "Bark" },
+      { type: "gotify", label: "Gotify" },
     ],
     [],
   );

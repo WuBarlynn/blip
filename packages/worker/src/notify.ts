@@ -185,6 +185,25 @@ async function sendChannel(
         : undefined;
       return post(url, event, { method: channel.method ?? "POST", ...(headers ? { headers } : {}) });
     }
+    case "bark": {
+      const url = resolveRef(channel.url, env);
+      if (unresolved(url)) return { ok: false, error: "missing Bark url" };
+      return post(url, {
+        title: `服务通知：${event.siteName}`,
+        body: `状态：${event.type}\n${text}`,
+        url: "https://bark.day.app",
+      });
+    }
+    case "gotify": {
+      const url = resolveRef(channel.url, env);
+      const token = resolveRef(channel.token, env);
+      if (unresolved(url) || unresolved(token)) return { ok: false, error: "missing Gotify url/token" };
+      return post(
+        url,
+        { title: `服务通知：${event.siteName}`, message: `状态：${event.type}\n${text}`, priority: channel.priority ?? 5 },
+        { headers: { "x-gotify-key": token } },
+      );
+    }
     default: {
       const _never: never = channel;
       return { ok: false, error: `unknown channel ${String(_never)}` };
