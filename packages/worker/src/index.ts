@@ -10,7 +10,7 @@
  *     from the static dashboard assets (SPA fallback handled by assets config).
  */
 
-import type { Incident, Summary } from "@blip/shared";
+import type { Incident, SiteHistory, Summary } from "@blip/shared";
 import { CONFIG } from "./config.js";
 import {
   clearCookie,
@@ -38,7 +38,7 @@ import { reconcile, type SiteResult } from "./incidents.js";
 import { dispatchNotifications, napcatText, type NotifyEvent } from "./notify.js";
 import { EMPTY_STATE, siteStateFor, type WorkerState } from "./state.js";
 import { appendPoint, getKv, prunePoints, setKv } from "./store.js";
-import { buildSiteHistory, buildSummary } from "./summary.js";
+import { buildSummary, refreshSiteHistory } from "./summary.js";
 import { iso, MS_PER_DAY, MS_PER_HOUR } from "./time.js";
 
 const POINTS_RETENTION_MS = 90 * MS_PER_DAY;
@@ -192,14 +192,18 @@ async function runChecks(env: Env, now: number): Promise<void> {
   const sent = await dispatchNotifications(events, config.channels, nextState, env, now);
   if (sent > 0) console.log(`notify: sent ${sent} alert(s) across ${events.length} event(s)`);
 
-  // 5. Build precomputed blobs.
-  const summary = await buildSummary(db, config, nextState, incidents, now);
-  await setKv(db, "blob:summary", summary);
-  await setKv(db, "blob:incidents", incidents);
+  // 5. Incrementally refresh history blobs, then derive summary statistics from
+  // those in-memory histories instead of re-scanning D1's overlapping windows.
+  const histories = new Map<string, SiteHistory>();
   for (const site of config.sites) {
-    const history = await buildSiteHistory(db, site, now);
+    const previous = await getKv<SiteHistory>(db, `blob:history:${site.id}`);
+    const history = await refreshSiteHistory(db, site, previous, now);
+    histories.set(site.id, history);
     await setKv(db, `blob:history:${site.id}`, history);
   }
+  const summary = await buildSummary(db, config, nextState, incidents, histories, now);
+  await setKv(db, "blob:summary", summary);
+  await setKv(db, "blob:incidents", incidents);
 
   // 6. Persist state.
   nextState.updatedAt = iso(now);

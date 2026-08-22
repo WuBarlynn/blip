@@ -11,6 +11,8 @@ import {
   type BrandConfig,
   type GroupSummary,
   type Incident,
+  type HistoryPoint,
+  type DailyRollup,
   type SiteHistory,
   type SiteSummary,
   type Status,
@@ -19,26 +21,80 @@ import {
 } from "@blip/shared";
 import type { ResolvedConfig, ResolvedSite } from "./config-types.js";
 import type { WorkerState } from "./state.js";
-import {
-  dailyRollups,
-  pointsSince,
-  recentSpark,
-  windowStats,
-} from "./store.js";
+import { dailyRollups, pointsSince } from "./store.js";
 import { iso, MS_PER_DAY } from "./time.js";
 
+const HISTORY_DAYS = 7;
+const ROLLUP_DAYS = 90;
+
+function pointTimestamp(point: HistoryPoint): number {
+  return Date.parse(point.t);
+}
+
 /**
- * Per-site history blob: raw points for the last 7 days + 90-day daily rollups.
- * Mirrors the engine's history file (points capped at ~7d, daily for long-range).
+ * Refresh a cached site history by appending only points collected since its
+ * newest entry. A missing cache (or a cache made stale by an altered clock) is
+ * rebuilt from D1, while normal ticks read only the new ten-minute window.
  */
-export async function buildSiteHistory(
+export async function refreshSiteHistory(
   db: D1Database,
   site: ResolvedSite,
+  previous: SiteHistory | null,
   now: number = Date.now(),
 ): Promise<SiteHistory> {
-  const points = await pointsSince(db, site.id, now - 7 * MS_PER_DAY);
-  const daily = await dailyRollups(db, site.id, 90);
+  const rawSince = now - HISTORY_DAYS * MS_PER_DAY;
+  const existing = previous?.id === site.id ? previous : null;
+  const newest = existing?.points.at(-1);
+  const newestAt = newest ? pointTimestamp(newest) : Number.NaN;
+  const canAppend = Number.isFinite(newestAt) && newestAt >= rawSince && newestAt <= now;
+  const points = canAppend
+    ? [
+        ...existing!.points.filter((point) => pointTimestamp(point) >= rawSince),
+        ...(await pointsSince(db, site.id, newestAt + 1)),
+      ]
+    : await pointsSince(db, site.id, rawSince);
+
+  if (!existing || !canAppend) {
+    return { id: site.id, points, daily: await dailyRollups(db, site.id, ROLLUP_DAYS) };
+  }
+
+  const today = new Date(now).toISOString().slice(0, 10);
+  const dayStart = Date.parse(`${today}T00:00:00.000Z`);
+  const todayPoints = points.filter((point) => pointTimestamp(point) >= dayStart);
+  const todayRollup = dailyRollup(today, todayPoints);
+  const oldestDay = new Date(now - ROLLUP_DAYS * MS_PER_DAY).toISOString().slice(0, 10);
+  const daily = existing.daily.filter((rollup) => rollup.d >= oldestDay && rollup.d !== today);
+  if (todayRollup) daily.push(todayRollup);
+
   return { id: site.id, points, daily };
+}
+
+function dailyRollup(day: string, points: HistoryPoint[]): DailyRollup | null {
+  if (points.length === 0) return null;
+  let up = 0;
+  let down = 0;
+  let degraded = 0;
+  let msSum = 0;
+  let msCount = 0;
+  for (const point of points) {
+    if (point.s === "up") up += 1;
+    else if (point.s === "down") down += 1;
+    else degraded += 1;
+    if (point.ms !== null) {
+      msSum += point.ms;
+      msCount += 1;
+    }
+  }
+  const total = points.length;
+  return {
+    d: day,
+    up,
+    down,
+    degraded,
+    total,
+    uptime: (up + degraded * 0.5) / total,
+    avgMs: msCount > 0 ? Math.round(msSum / msCount) : null,
+  };
 }
 
 interface SiteStatsResult {
@@ -50,34 +106,55 @@ interface SiteStatsResult {
   spark: Status[];
 }
 
-async function siteStats(db: D1Database, siteId: string, now: number): Promise<SiteStatsResult> {
-  const [w24, w7, w30, w90, spark] = await Promise.all([
-    windowStats(db, siteId, now - MS_PER_DAY),
-    windowStats(db, siteId, now - 7 * MS_PER_DAY),
-    windowStats(db, siteId, now - 30 * MS_PER_DAY),
-    windowStats(db, siteId, now - 90 * MS_PER_DAY),
-    recentSpark(db, siteId, 45),
-  ]);
+function statsForPoints(points: HistoryPoint[]): { uptime: number; avgMs: number | null } {
+  if (points.length === 0) return { uptime: 1, avgMs: null };
+  let weight = 0;
+  let msSum = 0;
+  let msCount = 0;
+  for (const point of points) {
+    weight += point.s === "up" ? 1 : point.s === "degraded" ? 0.5 : 0;
+    if (point.ms !== null) {
+      msSum += point.ms;
+      msCount += 1;
+    }
+  }
+  return { uptime: weight / points.length, avgMs: msCount > 0 ? Math.round(msSum / msCount) : null };
+}
+
+function uptimeForRollups(rollups: DailyRollup[]): number {
+  const total = rollups.reduce((sum, rollup) => sum + rollup.total, 0);
+  return total === 0 ? 1 : rollups.reduce((sum, rollup) => sum + rollup.uptime * rollup.total, 0) / total;
+}
+
+function siteStatsFromHistory(history: SiteHistory, now: number): SiteStatsResult {
+  const since24h = now - MS_PER_DAY;
+  const since7d = now - HISTORY_DAYS * MS_PER_DAY;
+  const p24h = history.points.filter((point) => pointTimestamp(point) >= since24h);
+  const p7d = history.points.filter((point) => pointTimestamp(point) >= since7d);
+  const day30 = new Date(now - 30 * MS_PER_DAY).toISOString().slice(0, 10);
+  const day90 = new Date(now - ROLLUP_DAYS * MS_PER_DAY).toISOString().slice(0, 10);
   return {
-    uptime24h: w24.uptime,
-    uptime7d: w7.uptime,
-    uptime30d: w30.uptime,
-    uptime90d: w90.uptime,
-    avgResponse24h: w24.avgMs,
-    spark,
+    uptime24h: statsForPoints(p24h).uptime,
+    uptime7d: statsForPoints(p7d).uptime,
+    uptime30d: uptimeForRollups(history.daily.filter((rollup) => rollup.d >= day30)),
+    uptime90d: uptimeForRollups(history.daily.filter((rollup) => rollup.d >= day90)),
+    avgResponse24h: statsForPoints(p24h).avgMs,
+    spark: history.points.slice(-45).map((point) => point.s),
   };
 }
 
-async function buildSiteSummary(
-  db: D1Database,
+function buildSiteSummary(
   site: ResolvedSite,
   state: WorkerState,
   now: number,
-): Promise<SiteSummary> {
+  history: SiteHistory | undefined,
+): SiteSummary {
   const ss = state.sites[site.id];
   const stats = site.paused
     ? { uptime24h: 1, uptime7d: 1, uptime30d: 1, uptime90d: 1, avgResponse24h: null, spark: [] as Status[] }
-    : await siteStats(db, site.id, now);
+    : history
+      ? siteStatsFromHistory(history, now)
+      : { uptime24h: 1, uptime7d: 1, uptime30d: 1, uptime90d: 1, avgResponse24h: null, spark: [] as Status[] };
 
   const status: Status = site.paused ? "up" : ss?.lastStatus ?? "down";
 
@@ -110,15 +187,16 @@ async function buildSiteSummary(
 }
 
 export async function buildSummary(
-  db: D1Database,
+  _db: D1Database,
   config: ResolvedConfig,
   state: WorkerState,
   incidents: Incident[],
+  histories: ReadonlyMap<string, SiteHistory> = new Map(),
   now: number = Date.now(),
 ): Promise<Summary> {
   const siteSummaries: SiteSummary[] = [];
   for (const site of config.sites) {
-    siteSummaries.push(await buildSiteSummary(db, site, state, now));
+    siteSummaries.push(buildSiteSummary(site, state, now, histories.get(site.id)));
   }
 
   // ---- totals (paused sites excluded from up/down/degraded tallies) ----

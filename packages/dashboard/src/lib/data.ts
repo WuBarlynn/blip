@@ -8,7 +8,7 @@ export const DATA_BASE: string = import.meta.env.VITE_DATA_BASE ?? "/data";
 export const REFRESH_MS: number = (() => {
   const raw = import.meta.env.VITE_REFRESH_MS;
   const n = raw ? Number(raw) : NaN;
-  return Number.isFinite(n) ? n : 60_000;
+  return Number.isFinite(n) ? n : 600_000;
 })();
 
 export class HttpError extends Error {

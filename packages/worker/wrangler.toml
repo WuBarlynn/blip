@@ -2,7 +2,7 @@
 #  Blip Worker — Cloudflare-native monitoring mode
 #
 #  ONE Cloudflare Worker that:
-#    - runs site checks on a Cron Trigger (every 5 minutes),
+#    - runs site checks on a Cron Trigger (every 10 minutes),
 #    - stores raw history + precomputed blobs in D1 (SQLite),
 #    - serves the static dashboard AND the /data/*.json API it fetches.
 #
@@ -43,9 +43,9 @@ routes = [
   { pattern = "status.wubarlynn.top", custom_domain = true }
 ]
 
-# Run the checks every 5 minutes.
+# Run the checks every 10 minutes.
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["*/10 * * * *"]
 
 # D1 binding. `database_id` MUST be filled in after `wrangler d1 create blip-db`
 # (step 1 above). The placeholder is intentionally invalid so a deploy without

@@ -174,7 +174,7 @@ export default function Overview() {
           hint={
             search
               ? "Try a different name, URL, or tag."
-              : "Blip probes every 5 minutes — if you just deployed, results appear after the first run. Otherwise, add sites to blip.config.yaml."
+              : "Blip refreshes status every 10 minutes — if you just deployed, results appear after the first run. Otherwise, add sites to blip.config.yaml."
           }
         />
       ) : (
