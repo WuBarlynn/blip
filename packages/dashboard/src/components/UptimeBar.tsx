@@ -102,11 +102,11 @@ export function UptimeBar({
                 />
               </TooltipTrigger>
               <TooltipContent>
-                {b.status === "empty" || !b.label ? (
+                {b.status === "empty" ? (
                   <span className="text-muted-foreground">No data</span>
                 ) : (
                   <div className="space-y-0.5 text-center">
-                    <div className="font-medium">{b.label}</div>
+                    {b.label && <div className="font-medium">{b.label}</div>}
                     <div className="text-muted-foreground">{uptimePct(b.uptime)} uptime</div>
                   </div>
                 )}
