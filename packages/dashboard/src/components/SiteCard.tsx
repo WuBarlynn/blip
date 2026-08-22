@@ -50,7 +50,7 @@ export function SiteCard({ site }: { site: SiteSummary }) {
           </div>
         </div>
 
-        <UptimeBar spark={site.spark} days={45} className="h-6" />
+        <UptimeBar spark={site.spark} sparkTimes={site.sparkTimes} days={45} className="h-6" />
 
         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>Checked {relativeTime(site.lastChecked)}</span>

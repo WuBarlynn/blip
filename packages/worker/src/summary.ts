@@ -104,6 +104,7 @@ interface SiteStatsResult {
   uptime90d: number;
   avgResponse24h: number | null;
   spark: Status[];
+  sparkTimes: string[];
 }
 
 function statsForPoints(points: HistoryPoint[]): { uptime: number; avgMs: number | null } {
@@ -140,6 +141,7 @@ function siteStatsFromHistory(history: SiteHistory, now: number): SiteStatsResul
     uptime90d: uptimeForRollups(history.daily.filter((rollup) => rollup.d >= day90)),
     avgResponse24h: statsForPoints(p24h).avgMs,
     spark: history.points.slice(-45).map((point) => point.s),
+    sparkTimes: history.points.slice(-45).map((point) => point.t),
   };
 }
 
@@ -151,10 +153,10 @@ function buildSiteSummary(
 ): SiteSummary {
   const ss = state.sites[site.id];
   const stats = site.paused
-    ? { uptime24h: 1, uptime7d: 1, uptime30d: 1, uptime90d: 1, avgResponse24h: null, spark: [] as Status[] }
+    ? { uptime24h: 1, uptime7d: 1, uptime30d: 1, uptime90d: 1, avgResponse24h: null, spark: [] as Status[], sparkTimes: [] }
     : history
       ? siteStatsFromHistory(history, now)
-      : { uptime24h: 1, uptime7d: 1, uptime30d: 1, uptime90d: 1, avgResponse24h: null, spark: [] as Status[] };
+      : { uptime24h: 1, uptime7d: 1, uptime30d: 1, uptime90d: 1, avgResponse24h: null, spark: [] as Status[], sparkTimes: [] };
 
   const status: Status = site.paused ? "up" : ss?.lastStatus ?? "down";
 
@@ -172,6 +174,7 @@ function buildSiteSummary(
     uptime90d: stats.uptime90d,
     avgResponse24h: stats.avgResponse24h,
     spark: stats.spark,
+    sparkTimes: stats.sparkTimes,
   };
 
   if (site.group) summary.group = site.group;

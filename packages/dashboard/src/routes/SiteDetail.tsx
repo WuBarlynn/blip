@@ -245,7 +245,13 @@ export default function SiteDetail() {
           <CardTitle>Last 90 days</CardTitle>
         </CardHeader>
         <CardContent>
-          <UptimeBar daily={history?.daily} spark={site.spark} days={90} showLegend />
+          <UptimeBar
+            daily={history?.daily}
+            spark={site.spark}
+            sparkTimes={site.sparkTimes}
+            days={90}
+            showLegend
+          />
         </CardContent>
       </Card>
 

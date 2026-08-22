@@ -420,6 +420,8 @@ export interface SiteSummary {
   domain?: DomainInfo;
   /** Last ~45 status buckets for the sparkline/uptime bar (newest last). */
   spark: Status[];
+  /** Timestamps for spark buckets, aligned with `spark` (newest last). */
+  sparkTimes?: string[];
 }
 
 export interface GroupSummary {

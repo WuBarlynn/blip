@@ -41,7 +41,7 @@ function StatusSiteRow({ site }: { site: SiteSummary }) {
         </div>
       </div>
       <div className="mt-3">
-        <UptimeBar spark={site.spark} days={90} className="h-7" showLegend />
+        <UptimeBar spark={site.spark} sparkTimes={site.sparkTimes} days={90} className="h-7" showLegend />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { DailyRollup, Status } from "@blip/shared";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { uptimePct } from "@/lib/format";
+import { dateTime, uptimePct } from "@/lib/format";
 
 /** One bar in the strip: a day's worth of status, or "no data". */
 interface Bucket {
@@ -34,6 +34,8 @@ interface UptimeBarProps {
   daily?: DailyRollup[];
   /** Fallback recent status buckets (oldest → newest) when no rollups exist. */
   spark?: Status[];
+  /** Timestamps aligned with `spark` for the fallback tooltip. */
+  sparkTimes?: string[];
   /** Number of bars to render (right-aligned, padded with empties). */
   days?: number;
   /** Bar height. */
@@ -50,6 +52,7 @@ interface UptimeBarProps {
 export function UptimeBar({
   daily,
   spark,
+  sparkTimes,
   days = 90,
   className,
   showLegend = false,
@@ -59,11 +62,12 @@ export function UptimeBar({
     if (daily && daily.length > 0) {
       source = daily.slice(-days).map(dailyToBucket);
     } else if (spark && spark.length > 0) {
-      source = spark.slice(-days).map((s, i) => ({
-        key: `s${i}`,
+      const start = Math.max(0, spark.length - days);
+      source = spark.slice(start).map((s, i) => ({
+        key: `s${start + i}`,
         status: s,
         uptime: s === "up" ? 1 : s === "degraded" ? 0.5 : 0,
-        label: "",
+        label: sparkTimes?.[start + i] ?? "",
       }));
     } else {
       source = [];
@@ -77,7 +81,7 @@ export function UptimeBar({
       label: "",
     }));
     return [...empties, ...source];
-  }, [daily, spark, days]);
+  }, [daily, spark, sparkTimes, days]);
 
   const range = useMemo(() => {
     const labeled = buckets.filter((b) => b.label);
@@ -106,7 +110,7 @@ export function UptimeBar({
                   <span className="text-muted-foreground">No data</span>
                 ) : (
                   <div className="space-y-0.5 text-center">
-                    {b.label && <div className="font-medium">{b.label}</div>}
+                    {b.label && <div className="font-medium">{dateTime(b.label)}</div>}
                     <div className="text-muted-foreground">{uptimePct(b.uptime)} uptime</div>
                   </div>
                 )}
