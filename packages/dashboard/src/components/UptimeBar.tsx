@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import type { DailyRollup, Status } from "@blip/shared";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { dateTime, uptimePct } from "@/lib/format";
+import { dateOnly, dateTime, uptimePct } from "@/lib/format";
+import { t } from "@/lib/i18n";
 
 /** One bar in the strip: a day's worth of status, or "no data". */
 interface Bucket {
@@ -42,6 +43,8 @@ interface UptimeBarProps {
   className?: string;
   /** Show the date range caption below the strip. */
   showLegend?: boolean;
+  /** Detailed pages show daily rollups without a clock time. */
+  dateOnly?: boolean;
 }
 
 /**
@@ -56,7 +59,9 @@ export function UptimeBar({
   days = 90,
   className,
   showLegend = false,
+  dateOnly: showDateOnly = false,
 }: UptimeBarProps) {
+  const text = t();
   const buckets = useMemo<Bucket[]>(() => {
     let source: Bucket[];
     if (daily && daily.length > 0) {
@@ -102,16 +107,16 @@ export function UptimeBar({
                     "h-full min-w-[2px] flex-1 rounded-[2px] transition-opacity hover:opacity-70",
                     STATUS_COLOR[b.status],
                   )}
-                  aria-label={b.label ? `${b.label}: ${uptimePct(b.uptime)} uptime` : "No data"}
+                  aria-label={b.label ? `${b.label}: ${uptimePct(b.uptime)} ${text.uptime}` : text.noData}
                 />
               </TooltipTrigger>
               <TooltipContent>
                 {b.status === "empty" ? (
-                  <span className="text-muted-foreground">No data</span>
+                  <span className="text-muted-foreground">{text.noData}</span>
                 ) : (
                   <div className="space-y-0.5 text-center">
-                    {b.label && <div className="font-medium">{dateTime(b.label)}</div>}
-                    <div className="text-muted-foreground">{uptimePct(b.uptime)} uptime</div>
+                    {b.label && <div className="font-medium">{showDateOnly ? dateOnly(b.label) : dateTime(b.label)}</div>}
+                    <div className="text-muted-foreground">{uptimePct(b.uptime)} {text.uptime}</div>
                   </div>
                 )}
               </TooltipContent>
@@ -121,8 +126,8 @@ export function UptimeBar({
       </TooltipProvider>
       {showLegend && range.count > 0 && (
         <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>{range.count} days ago</span>
-          <span>Today</span>
+          <span>{text.daysAgo(range.count)}</span>
+          <span>{text.today}</span>
         </div>
       )}
     </div>

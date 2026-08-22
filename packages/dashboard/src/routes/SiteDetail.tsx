@@ -251,6 +251,7 @@ export default function SiteDetail() {
             sparkTimes={site.sparkTimes}
             days={90}
             showLegend
+            dateOnly
           />
         </CardContent>
       </Card>

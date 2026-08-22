@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  ChevronDown,
   LogOut,
   LogIn,
 } from "lucide-react";
@@ -21,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth, ROLE_LABEL } from "@/lib/auth";
 import { useSummary } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 interface NavItem {
   to: string;
@@ -48,28 +50,43 @@ export function useLayoutSearch(): string {
 
 function NavItems({ onNavigate }: { onNavigate?: () => void }) {
   const { authenticated } = useAuth();
+  const [statusOpen, setStatusOpen] = useState(false);
+  const text = t();
+  const labels: Record<string, string> = {
+    "/": text.overview,
+    "/sites": text.sites,
+    "/incidents": text.incidents,
+    "/settings": text.settings,
+  };
   // Settings is login-only; hide it from anonymous (public-dashboard) viewers.
-  const items = NAV.filter((n) => authenticated || n.to !== "/settings");
+  const items = NAV.filter((n) => n.to !== "/status/wubarlynn" && (authenticated || n.to !== "/settings"));
   return (
     <nav className="flex flex-col gap-1">
-      {items.map(({ to, label, icon: Icon, end }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={end}
-          onClick={onNavigate}
-          className={({ isActive }) =>
-            cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              isActive
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground",
-            )
-          }
-        >
+      {items.slice(0, 3).map(({ to, icon: Icon, end }) => (
+        <NavLink key={to} to={to} end={end} onClick={onNavigate} className={({ isActive }) => cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground")}>
           <Icon className="size-4" />
-          {label}
-          {to === "/status/wubarlynn" && <ExternalLink className="ml-auto size-3.5 opacity-60" />}
+          {labels[to]}
+        </NavLink>
+      ))}
+      <button type="button" onClick={() => setStatusOpen((open) => !open)} className="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-expanded={statusOpen}>
+        <Globe className="size-4" />
+        {text.statusPages}
+        <ChevronDown className={cn("ml-auto size-4 transition-transform", statusOpen && "rotate-180")} />
+      </button>
+      {statusOpen && (
+        <div className="ml-5 flex flex-col gap-1 border-l border-border pl-3">
+          <a href="/status/wubarlynn" onClick={onNavigate} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+            {text.allServices}<ExternalLink className="ml-auto size-3 opacity-60" />
+          </a>
+          <a href="/status/xgs" onClick={onNavigate} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+            {text.xgsServices}<ExternalLink className="ml-auto size-3 opacity-60" />
+          </a>
+        </div>
+      )}
+      {items.slice(3).map(({ to, icon: Icon, end }) => (
+        <NavLink key={to} to={to} end={end} onClick={onNavigate} className={({ isActive }) => cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors", isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground")}>
+          <Icon className="size-4" />
+          {labels[to]}
         </NavLink>
       ))}
     </nav>

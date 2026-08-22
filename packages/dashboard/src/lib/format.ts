@@ -1,4 +1,5 @@
 import { formatDistanceToNowStrict, format, formatDuration, intervalToDuration } from "date-fns";
+import { zhCN } from "date-fns/locale";
 import type { Status, OverallStatus, SiteSummary } from "@blip/shared";
 
 // ---------------------------------------------------------------------------
@@ -89,6 +90,10 @@ export function responseMs(ms: number | null | undefined): string {
 // Time
 // ---------------------------------------------------------------------------
 
+function isChineseLocale(): boolean {
+  return typeof navigator !== "undefined" && navigator.language.toLowerCase().startsWith("zh");
+}
+
 /** "3 minutes ago" — safe against bad/empty dates. */
 export function relativeTime(iso: string | null | undefined): string {
   if (!iso) return "—";
@@ -97,12 +102,20 @@ export function relativeTime(iso: string | null | undefined): string {
   return `${formatDistanceToNowStrict(d)} ago`;
 }
 
-/** Absolute, human date-time. */
+/** Absolute date and time, formatted for the browser language. */
 export function dateTime(iso: string | null | undefined): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return format(d, "MMM d, yyyy HH:mm");
+  return isChineseLocale() ? format(d, "yyyy年M月d日 HH:mm", { locale: zhCN }) : format(d, "MMM d, yyyy HH:mm");
+}
+
+/** Absolute date only, formatted for the browser language. */
+export function dateOnly(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return isChineseLocale() ? format(d, "yyyy年M月d日", { locale: zhCN }) : format(d, "MMM d, yyyy");
 }
 
 /** Short date for chart axes / tooltips. */
