@@ -145,6 +145,7 @@ function UserChip() {
 export function AppLayout() {
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const text = t();
   const { data: summary } = useSummary();
   const brandName = summary?.brand?.name;
 
@@ -191,7 +192,7 @@ export function AppLayout() {
             size="icon"
             className="lg:hidden"
             onClick={() => setMobileOpen(true)}
-            aria-label="Open menu"
+            aria-label={text.openMenu}
           >
             <Menu className="size-5" />
           </Button>
@@ -200,7 +201,7 @@ export function AppLayout() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search sites…"
+              placeholder={text.searchSites}
               className="pl-9"
             />
           </div>

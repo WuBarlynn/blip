@@ -25,12 +25,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { uptimePct, uptimeColor } from "@/lib/format";
 import { useLayoutSearch } from "@/components/AppLayout";
 import { overallStatus } from "@blip/shared";
+import { t } from "@/lib/i18n";
 
 export default function Overview() {
   const { data, error, loading, reload } = useSummary();
   const auth = useAuth();
   const search = useLayoutSearch();
   const [group, setGroup] = useState<string>("all");
+  const text = t();
 
   useBrand(data?.brand);
 
@@ -82,7 +84,7 @@ export default function Overview() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Overview" description="Live health across every monitored target." />
+        <PageHeader title={text.overview} description={text.liveHealth} />
         <Skeleton className="h-20 w-full rounded-xl" />
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -97,7 +99,7 @@ export default function Overview() {
   if (error && !data) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Overview" />
+        <PageHeader title={text.overview} />
         <ErrorState message={error.message} onRetry={reload} />
       </div>
     );
@@ -107,35 +109,32 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Overview"
-        description="Live health across every monitored target."
-      />
+      <PageHeader title={text.overview} description={text.liveHealth} />
 
       <OverallBanner status={overall} generatedAt={data.generatedAt} />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatCard label="Total sites" value={totals.sites} icon={<Activity className="size-5" />} />
+        <StatCard label={text.totalSites} value={totals.sites} icon={<Activity className="size-5" />} />
         <StatCard
-          label="Up"
+          label={text.up}
           value={totals.up}
           tone="text-up"
           icon={<ArrowUpCircle className="size-5 text-up" />}
         />
         <StatCard
-          label="Down"
+          label={text.downCount}
           value={totals.down}
           tone={totals.down > 0 ? "text-down" : undefined}
           icon={<ArrowDownCircle className="size-5 text-down" />}
         />
         <StatCard
-          label="Degraded"
+          label={text.degraded}
           value={totals.degraded}
           tone={totals.degraded > 0 ? "text-degraded" : undefined}
           icon={<AlertTriangle className="size-5 text-degraded" />}
         />
         <StatCard
-          label="Uptime (24h)"
+          label={text.uptime24h}
           value={uptimePct(totals.uptime)}
           tone={uptimeColor(totals.uptime)}
           icon={<Gauge className="size-5" />}
@@ -144,7 +143,7 @@ export default function Overview() {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold tracking-tight">
-          Sites
+          {text.sites}
           {filtered.length !== visibleSites.length && (
             <span className="ml-2 text-sm font-normal text-muted-foreground">
               {filtered.length} of {visibleSites.length}
@@ -154,10 +153,10 @@ export default function Overview() {
         {groups.length > 0 && (
           <Select value={group} onValueChange={setGroup}>
             <SelectTrigger className="w-full sm:w-52">
-              <SelectValue placeholder="All groups" />
+              <SelectValue placeholder={text.allGroups} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All groups</SelectItem>
+              <SelectItem value="all">{text.allGroups}</SelectItem>
               {groups.map((g) => (
                 <SelectItem key={g.id} value={g.id}>
                   {g.icon ? `${g.icon} ${g.name}` : g.name}
@@ -170,12 +169,8 @@ export default function Overview() {
 
       {filtered.length === 0 ? (
         <EmptyState
-          title={search ? "No sites match your search" : "Waiting for the first check"}
-          hint={
-            search
-              ? "Try a different name, URL, or tag."
-              : "Blip refreshes status every 10 minutes — if you just deployed, results appear after the first run. Otherwise, add sites to blip.config.yaml."
-          }
+          title={search ? text.noSitesMatch : text.waitingForFirstCheck}
+          hint={search ? text.tryDifferentSearch : text.refreshHint}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

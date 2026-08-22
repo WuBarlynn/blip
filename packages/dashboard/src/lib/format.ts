@@ -1,6 +1,7 @@
 import { formatDistanceToNowStrict, format, formatDuration, intervalToDuration } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import type { Status, OverallStatus, SiteSummary } from "@blip/shared";
+import { t } from "@/lib/i18n";
 
 // ---------------------------------------------------------------------------
 // Status presentation maps
@@ -13,12 +14,10 @@ export function siteDisplayStatus(site: Pick<SiteSummary, "status" | "paused">):
   return site.paused ? "paused" : site.status;
 }
 
-export const STATUS_LABEL: Record<DisplayStatus, string> = {
-  up: "Operational",
-  degraded: "Degraded",
-  down: "Down",
-  paused: "Paused",
-};
+export function statusLabel(status: DisplayStatus): string {
+  const text = t();
+  return status === "up" ? text.operational : status === "degraded" ? text.degraded : status === "down" ? text.down : text.paused;
+}
 
 /** Tailwind text color class per status. */
 export const STATUS_TEXT: Record<DisplayStatus, string> = {
@@ -99,7 +98,8 @@ export function relativeTime(iso: string | null | undefined): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return `${formatDistanceToNowStrict(d)} ago`;
+  const distance = formatDistanceToNowStrict(d, { locale: isChineseLocale() ? zhCN : undefined });
+  return isChineseLocale() ? `${distance}前` : `${distance} ago`;
 }
 
 /** Absolute date and time, formatted for the browser language. */

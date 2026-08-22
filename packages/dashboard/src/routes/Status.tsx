@@ -16,6 +16,7 @@ import { IncidentRow } from "@/components/IncidentRow";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/States";
+import { t } from "@/lib/i18n";
 import {
   uptimePct,
   uptimeColor,
@@ -79,6 +80,7 @@ export default function Status({ groupId }: { groupId?: string }) {
   const { data, error, loading, reload, unauthorized } = useSummary();
   const auth = useAuth();
   const [showLogin, setShowLogin] = useState(false);
+  const text = t();
   useBrand(data?.brand);
 
   const publicSites = useMemo(
@@ -120,7 +122,7 @@ export default function Status({ groupId }: { groupId?: string }) {
 
   const brand = data?.brand;
   const isXgs = groupId === "xgs";
-  const brandName = isXgs ? "XGS服务器状态" : brand?.name?.trim() || "Blip";
+  const brandName = isXgs ? text.xgsStatus : brand?.name?.trim() || "Blip";
   const tagline = isXgs ? undefined : brand?.tagline;
 
   // The Worker returned 401 for /data/summary.json (status page not public and
@@ -145,7 +147,7 @@ export default function Status({ groupId }: { groupId?: string }) {
                     rel="noreferrer"
                     className="hidden items-center gap-1 text-sm text-muted-foreground hover:text-primary sm:inline-flex"
                   >
-                    Website <ExternalLink className="size-3.5" />
+                    {text.website} <ExternalLink className="size-3.5" />
                   </a>
                 )}
                 {auth.authenticated ? (
@@ -155,7 +157,7 @@ export default function Status({ groupId }: { groupId?: string }) {
                     onClick={() => void auth.logout()}
                     className="text-muted-foreground"
                   >
-                    <LogOut className="size-3.5" /> Sign out
+                    <LogOut className="size-3.5" /> {text.signOut}
                   </Button>
                 ) : (
                   <Button
@@ -164,7 +166,7 @@ export default function Status({ groupId }: { groupId?: string }) {
                     onClick={() => setShowLogin(true)}
                     className="text-muted-foreground"
                   >
-                    <LogIn className="size-3.5" /> Sign in
+                    <LogIn className="size-3.5" /> {text.signIn}
                   </Button>
                 )}
               </>
@@ -184,7 +186,7 @@ export default function Status({ groupId }: { groupId?: string }) {
             </div>
           ) : error && !data ? (
             <ErrorState
-              title="Status temporarily unavailable"
+              title={text.statusUnavailable}
               message={error.message}
               onRetry={reload}
             />
@@ -192,7 +194,7 @@ export default function Status({ groupId }: { groupId?: string }) {
             <div className="space-y-8 animate-fade-in">
               {/* Hero */}
               <div className="text-center">
-                <h1 className="text-3xl font-bold tracking-tight">{brandName} Status</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{brandName} {text.status}</h1>
                 {tagline && (
                   <p className="mx-auto mt-2 max-w-xl text-balance text-muted-foreground">
                     {tagline}
@@ -206,7 +208,7 @@ export default function Status({ groupId }: { groupId?: string }) {
               {activeIncidents.length > 0 && (
                 <section className="space-y-3">
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Active incidents
+                    {text.activeIncidents}
                   </h2>
                   {activeIncidents.map((inc) => (
                     <IncidentRow key={inc.id} incident={inc} />
@@ -216,7 +218,7 @@ export default function Status({ groupId }: { groupId?: string }) {
 
               {/* Components by group */}
               {sections.length === 0 ? (
-                <EmptyState title="No public components" hint="Nothing is published yet." />
+                <EmptyState title={text.noPublicComponents} hint={text.nothingPublished} />
               ) : (
                 <section className="space-y-5">
                   {sections.map((s, i) => (
@@ -226,7 +228,7 @@ export default function Status({ groupId }: { groupId?: string }) {
               )}
 
               <p className="text-center text-xs text-muted-foreground">
-                Last updated {relativeTime(data.generatedAt)}
+                {text.lastUpdated} {relativeTime(data.generatedAt)}
               </p>
             </div>
           )}

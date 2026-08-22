@@ -13,11 +13,13 @@ import {
   relativeTime,
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 /** Overview grid card for a single monitored site. */
 export function SiteCard({ site }: { site: SiteSummary }) {
   const ds = siteDisplayStatus(site);
   const ssl = site.ssl ? expiryChip(site.ssl.daysRemaining, site.ssl.expiringSoon) : null;
+  const text = t();
 
   return (
     <Card className="group transition-shadow hover:shadow-md">
@@ -37,13 +39,13 @@ export function SiteCard({ site }: { site: SiteSummary }) {
 
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-xs text-muted-foreground">Response</p>
+            <p className="text-xs text-muted-foreground">{text.response}</p>
             <p className="text-lg font-semibold tabular-nums">
               {responseMs(site.responseTime)}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-muted-foreground">90-day uptime</p>
+            <p className="text-xs text-muted-foreground">{text.uptime90d}</p>
             <p className={cn("text-lg font-semibold tabular-nums", uptimeColor(site.uptime90d))}>
               {uptimePct(site.uptime90d)}
             </p>
@@ -53,7 +55,7 @@ export function SiteCard({ site }: { site: SiteSummary }) {
         <UptimeBar spark={site.spark} sparkTimes={site.sparkTimes} days={45} className="h-6" />
 
         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-          <span>Checked {relativeTime(site.lastChecked)}</span>
+          <span>{text.checked} {relativeTime(site.lastChecked)}</span>
           {ssl && (
             <span
               className={cn(

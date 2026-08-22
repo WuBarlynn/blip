@@ -1,9 +1,9 @@
 import type { OverallStatus } from "@blip/shared";
-import { OVERALL_LABEL } from "@blip/shared";
 import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OVERALL_DISPLAY_STATUS } from "@/lib/format";
 import { relativeTime } from "@/lib/format";
+import { t } from "@/lib/i18n";
 
 const TONE: Record<OverallStatus, { wrap: string; icon: string }> = {
   operational: {
@@ -42,6 +42,8 @@ interface OverallBannerProps {
 /** The big "all systems operational" banner. */
 export function OverallBanner({ status, generatedAt, hero = false, className }: OverallBannerProps) {
   const tone = TONE[status];
+  const text = t();
+  const label = status === "operational" ? text.allSystemsOperational : status === "degraded" ? text.degraded : status === "partial_outage" ? text.partialOutage : text.majorOutage;
   return (
     <div
       className={cn(
@@ -62,10 +64,10 @@ export function OverallBanner({ status, generatedAt, hero = false, className }: 
       </div>
       <div className="min-w-0">
         <p className={cn("font-semibold tracking-tight", hero ? "text-2xl" : "text-lg")}>
-          {OVERALL_LABEL[status]}
+          {label}
         </p>
         {generatedAt && (
-          <p className="text-sm text-muted-foreground">Updated {relativeTime(generatedAt)}</p>
+          <p className="text-sm text-muted-foreground">{text.updated} {relativeTime(generatedAt)}</p>
         )}
       </div>
     </div>

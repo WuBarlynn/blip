@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { StatusDot } from "@/components/StatusDot";
-import { STATUS_LABEL, STATUS_SOFT, type DisplayStatus } from "@/lib/format";
+import { statusLabel, STATUS_SOFT, type DisplayStatus } from "@/lib/format";
 
 interface StatusBadgeProps {
   status: DisplayStatus;
@@ -18,7 +18,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       )}
     >
       <StatusDot status={status} />
-      {STATUS_LABEL[status]}
+      {statusLabel(status)}
     </span>
   );
 }
