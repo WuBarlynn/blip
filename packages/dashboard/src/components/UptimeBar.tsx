@@ -88,12 +88,7 @@ export function UptimeBar({
     return [...empties, ...source];
   }, [daily, spark, sparkTimes, days]);
 
-  const range = useMemo(() => {
-    const labeled = buckets.filter((b) => b.label);
-    const first = labeled[0]?.label;
-    const last = labeled[labeled.length - 1]?.label;
-    return { first, last, count: labeled.length };
-  }, [buckets]);
+  const hasEarlierData = buckets.some((bucket) => bucket.status === "empty");
 
   return (
     <div className="w-full">
@@ -124,9 +119,9 @@ export function UptimeBar({
           ))}
         </div>
       </TooltipProvider>
-      {showLegend && range.count > 0 && (
+      {showLegend && buckets.some((bucket) => bucket.label) && (
         <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>{text.daysAgo(range.count)}</span>
+          <span>{hasEarlierData ? text.earlier : text.daysAgo(days)}</span>
           <span>{text.today}</span>
         </div>
       )}
