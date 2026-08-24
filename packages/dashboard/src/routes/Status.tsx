@@ -112,12 +112,19 @@ export default function Status({ groupId }: { groupId?: string }) {
     return out;
   }, [data, publicSites]);
 
-  const activeIncidents = useMemo(
-    () =>
-      (data?.incidents ?? []).filter(
-        (i) => i.state === "open" && publicSites.some((s) => s.id === i.siteId),
-      ),
+  const incidents = useMemo(
+    () => (data?.incidents ?? []).filter((incident) => publicSites.some((site) => site.id === incident.siteId)),
     [data, publicSites],
+  );
+
+  const activeIncidents = useMemo(
+    () => incidents.filter((incident) => incident.state === "open"),
+    [incidents],
+  );
+
+  const incidentHistory = useMemo(
+    () => incidents.filter((incident) => incident.state !== "open"),
+    [incidents],
   );
 
   const brand = data?.brand;
@@ -213,6 +220,17 @@ export default function Status({ groupId }: { groupId?: string }) {
                   </h2>
                   {activeIncidents.map((inc) => (
                     <IncidentRow key={inc.id} incident={inc} />
+                  ))}
+                </section>
+              )}
+
+              {isXgs && incidentHistory.length > 0 && (
+                <section className="space-y-3">
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    {text.incidents}
+                  </h2>
+                  {incidentHistory.map((incident) => (
+                    <IncidentRow key={incident.id} incident={incident} hideSite />
                   ))}
                 </section>
               )}
