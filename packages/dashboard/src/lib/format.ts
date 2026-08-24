@@ -1,7 +1,7 @@
 import { formatDistanceToNowStrict, format, formatDuration, intervalToDuration } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import type { Status, OverallStatus, SiteSummary } from "@blip/shared";
-import { t } from "@/lib/i18n";
+import { isChinese, t } from "@/lib/i18n";
 
 // ---------------------------------------------------------------------------
 // Status presentation maps
@@ -90,7 +90,7 @@ export function responseMs(ms: number | null | undefined): string {
 // ---------------------------------------------------------------------------
 
 function isChineseLocale(): boolean {
-  return typeof navigator !== "undefined" && navigator.language.toLowerCase().startsWith("zh");
+  return isChinese();
 }
 
 /** "3 minutes ago" — safe against bad/empty dates. */
@@ -174,7 +174,7 @@ export function expiryChip(daysRemaining: number, expiringSoon: boolean): Expiry
     tone = "bg-secondary text-muted-foreground";
   }
   const label =
-    daysRemaining <= 0 ? "Expired" : `${daysRemaining}d`;
+    daysRemaining <= 0 ? (isChinese() ? "已过期" : "Expired") : `${daysRemaining}d`;
   return { label, tone, expiringSoon: expiringSoon || daysRemaining <= 14 };
 }
 
@@ -182,12 +182,12 @@ export function expiryChip(daysRemaining: number, expiringSoon: boolean): Expiry
 // Incident type badges
 // ---------------------------------------------------------------------------
 
-export const INCIDENT_TYPE_LABEL: Record<string, string> = {
-  down: "Outage",
-  degraded: "Degraded",
-  ssl_expiring: "SSL expiring",
-  domain_expiring: "Domain expiring",
-};
+export function incidentTypeLabel(type: string): string {
+  const labels = isChinese()
+    ? { down: "服务中断", degraded: "性能下降", ssl_expiring: "SSL 即将过期", domain_expiring: "域名即将过期" }
+    : { down: "Outage", degraded: "Degraded", ssl_expiring: "SSL expiring", domain_expiring: "Domain expiring" };
+  return labels[type as keyof typeof labels] ?? type;
+}
 
 export const INCIDENT_TYPE_TONE: Record<string, string> = {
   down: "bg-down-soft text-down",

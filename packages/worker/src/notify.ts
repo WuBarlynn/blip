@@ -65,21 +65,21 @@ export function napcatText(e: NotifyEvent): string {
   let detail: string;
   switch (e.type) {
     case "down":
-      detail = `🔴 ${e.siteName} is DOWN`;
+      detail = `🔴 ${e.siteName} 不可用`;
       break;
     case "up": {
-      const dur = e.durationMs !== undefined ? ` after ${humanizeMs(e.durationMs)}` : "";
-      detail = `✅ ${e.siteName} recovered${dur}`;
+      const dur = e.durationMs !== undefined ? `，持续 ${humanizeMs(e.durationMs)}` : "";
+      detail = `✅ ${e.siteName} 已恢复${dur}`;
       break;
     }
     case "degraded":
-      detail = `🟡 ${e.siteName} is DEGRADED`;
+      detail = `🟡 ${e.siteName} 性能下降`;
       break;
     case "ssl":
-      detail = `🔐 ${e.siteName} — TLS certificate expires in ${e.ssl?.daysRemaining ?? "?"} days`;
+      detail = `🔐 ${e.siteName} 的 TLS 证书将在 ${e.ssl?.daysRemaining ?? "?"} 天后过期`;
       break;
     case "domain":
-      detail = `🌐 ${e.siteName} — domain expires in ${e.domain?.daysRemaining ?? "?"} days`;
+      detail = `🌐 ${e.siteName} 的域名将在 ${e.domain?.daysRemaining ?? "?"} 天后过期`;
       break;
   }
   return `服务器状态：${e.siteName}\n状态：${e.type}\n${detail}`;
@@ -91,27 +91,27 @@ export function plainText(e: NotifyEvent): string {
   let title: string;
   switch (e.type) {
     case "down":
-      title = `${emoji} ${e.siteName} is DOWN`;
+      title = `${emoji} ${e.siteName} 不可用`;
       if (e.detail) lines.push(e.detail);
       lines.push(e.url);
       break;
     case "up": {
-      const dur = e.durationMs !== undefined ? ` after ${humanizeMs(e.durationMs)}` : "";
-      title = `${emoji} ${e.siteName} recovered${dur}`;
+      const dur = e.durationMs !== undefined ? `，持续 ${humanizeMs(e.durationMs)}` : "";
+      title = `${emoji} ${e.siteName} 已恢复${dur}`;
       lines.push(e.url);
       break;
     }
     case "degraded":
-      title = `${emoji} ${e.siteName} is DEGRADED`;
+      title = `${emoji} ${e.siteName} 性能下降`;
       if (e.detail) lines.push(e.detail);
       lines.push(e.url);
       break;
     case "ssl":
-      title = `${emoji} ${e.siteName} — TLS certificate expires in ${e.ssl?.daysRemaining ?? "?"} days`;
+      title = `${emoji} ${e.siteName} 的 TLS 证书将在 ${e.ssl?.daysRemaining ?? "?"} 天后过期`;
       lines.push(e.url);
       break;
     case "domain":
-      title = `${emoji} ${e.siteName} — domain expires in ${e.domain?.daysRemaining ?? "?"} days`;
+      title = `${emoji} ${e.siteName} 的域名将在 ${e.domain?.daysRemaining ?? "?"} 天后过期`;
       lines.push(e.url);
       break;
     default:

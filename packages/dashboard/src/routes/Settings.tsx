@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth, ROLE_LABEL, ROLE_DESCRIPTION } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 const ROLES: Role[] = ["SUPER_ADMIN", "ADMIN", "CLIENT", "VIEWER"];
 
@@ -69,6 +70,7 @@ export default function Settings() {
   useBrand(data?.brand);
 
   const brand = data?.brand;
+  const text = t();
 
   const scopeSummary = useMemo(() => {
     const scope = auth.scope;
@@ -86,8 +88,8 @@ export default function Settings() {
   return (
     <div>
       <PageHeader
-        title="Settings"
-        description="Read-only overview of how this workspace is configured."
+        title={text.settings}
+        description={text.settingsDescription}
       />
 
       <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
@@ -102,30 +104,30 @@ export default function Settings() {
         <Card>
           <CardHeader className="flex-row items-center gap-2 space-y-0">
             <Palette className="size-4 text-muted-foreground" />
-            <CardTitle>Branding</CardTitle>
+            <CardTitle>{text.branding}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
               <Skeleton className="h-24 w-full" />
             ) : (
               <dl className="space-y-2.5 text-sm">
-                <Row label="Name" value={brand?.name ?? "Blip"} />
-                <Row label="Tagline" value={brand?.tagline ?? "—"} />
+                <Row label={text.name} value={brand?.name ?? "Blip"} />
+                <Row label={text.tagline} value={brand?.tagline ?? "—"} />
                 <Row
-                  label="Accent"
+                  label={text.accent}
                   value={
                     <span className="inline-flex items-center gap-2">
                       <span
                         className="size-4 rounded-full border border-border"
                         style={{ background: brand?.primaryColor ?? "hsl(var(--primary))" }}
                       />
-                      <code className="text-xs">{brand?.primaryColor ?? "default"}</code>
+                      <code className="text-xs">{brand?.primaryColor ?? text.default}</code>
                     </span>
                   }
                 />
                 {brand?.website && (
                   <Row
-                    label="Website"
+                    label={text.website}
                     value={
                       <a
                         href={brand.website}
@@ -147,7 +149,7 @@ export default function Settings() {
         <Card>
           <CardHeader className="flex-row items-center gap-2 space-y-0">
             <Bell className="size-4 text-muted-foreground" />
-            <CardTitle>Notification channels</CardTitle>
+            <CardTitle>{text.notificationChannels}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <CardDescription>
@@ -174,7 +176,7 @@ export default function Settings() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex-row items-center gap-2 space-y-0">
             <Shield className="size-4 text-muted-foreground" />
-            <CardTitle>Roles &amp; access</CardTitle>
+            <CardTitle>{text.rolesAccess}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <CardDescription>

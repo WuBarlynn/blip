@@ -68,6 +68,22 @@ const TEXT = {
     adminSignIn: "Admin sign in →",
     signedInUser: "Signed-in user",
     logOut: "Log out",
+    sitesDescription: "Every monitored target with response time, certificate and uptime windows.",
+    noSitesConfigured: "No sites configured",
+    addSitesHint: "Add sites in blip.config.yaml.",
+    site: "Site",
+    group: "Group",
+    responseTime: "Response",
+    domain: "Domain",
+    settingsDescription: "Read-only overview of how this workspace is configured.",
+    branding: "Branding",
+    name: "Name",
+    tagline: "Tagline",
+    accent: "Accent",
+    default: "default",
+    notificationChannels: "Notification channels",
+    rolesAccess: "Roles & access",
+    sourceDocs: "Source & docs",
   },
   zh: {
     overview: "概览",
@@ -132,9 +148,29 @@ const TEXT = {
     adminSignIn: "管理员登录 →",
     signedInUser: "已登录用户",
     logOut: "退出登录",
+    sitesDescription: "查看每个受监控目标的响应时间、证书与可用率。",
+    noSitesConfigured: "尚未配置站点",
+    addSitesHint: "请在 blip.config.yaml 中添加站点。",
+    site: "站点",
+    group: "分组",
+    responseTime: "响应时间",
+    domain: "域名",
+    settingsDescription: "只读查看此工作区的配置概况。",
+    branding: "品牌设置",
+    name: "名称",
+    tagline: "标语",
+    accent: "主题色",
+    default: "默认",
+    notificationChannels: "通知渠道",
+    rolesAccess: "角色与访问权限",
+    sourceDocs: "源码与文档",
   },
 } as const;
 
 export function t() {
   return TEXT[browserLocale()];
+}
+
+export function isChinese(): boolean {
+  return browserLocale() === "zh";
 }

@@ -7,10 +7,22 @@ import {
   dateTime,
   relativeTime,
   durationLabel,
-  INCIDENT_TYPE_LABEL,
+  incidentTypeLabel,
   INCIDENT_TYPE_TONE,
 } from "@/lib/format";
-import { t } from "@/lib/i18n";
+import { isChinese, t } from "@/lib/i18n";
+
+function localizedIncidentText(value: string): string {
+  if (!isChinese()) return value;
+  return value
+    .replace(/^Detected$/, "已检测到")
+    .replace(/^Recovered$/, "已恢复")
+    .replace(/^Renewed$/, "已更新")
+    .replace(/ is degraded$/, " 性能下降")
+    .replace(/ is down$/, " 不可用")
+    .replace(/^Slow response: (.+)$/, "响应缓慢：$1")
+    .replace(/^Expires in (.+)$/, "$1 后过期");
+}
 
 interface IncidentRowProps {
   incident: Incident;
@@ -22,7 +34,7 @@ interface IncidentRowProps {
 export function IncidentRow({ incident, hideSite = false }: IncidentRowProps) {
   const open = incident.state === "open";
   const tone = INCIDENT_TYPE_TONE[incident.type] ?? "bg-muted text-muted-foreground";
-  const label = INCIDENT_TYPE_LABEL[incident.type] ?? incident.type;
+  const label = incidentTypeLabel(incident.type);
   const text = t();
 
   return (
@@ -57,9 +69,9 @@ export function IncidentRow({ incident, hideSite = false }: IncidentRowProps) {
             )}
           </div>
 
-          <p className="mt-1.5 font-medium leading-snug">{incident.title}</p>
+          <p className="mt-1.5 font-medium leading-snug">{localizedIncidentText(incident.title)}</p>
           {incident.detail && (
-            <p className="mt-0.5 text-sm text-muted-foreground">{incident.detail}</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">{localizedIncidentText(incident.detail)}</p>
           )}
 
           {incident.updates && incident.updates.length > 0 && (
@@ -68,7 +80,7 @@ export function IncidentRow({ incident, hideSite = false }: IncidentRowProps) {
                 <li key={i} className="text-sm">
                   <span className="text-muted-foreground">{relativeTime(u.at)}</span>
                   <span className="mx-1.5 text-muted-foreground">·</span>
-                  {u.message}
+                  {localizedIncidentText(u.message)}
                 </li>
               ))}
             </ul>

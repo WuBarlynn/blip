@@ -26,6 +26,7 @@ import {
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useLayoutSearch } from "@/components/AppLayout";
+import { t } from "@/lib/i18n";
 
 type SortKey =
   | "name"
@@ -120,6 +121,7 @@ export default function Sites() {
   const { data, error, loading, reload } = useSummary();
   const auth = useAuth();
   const search = useLayoutSearch();
+  const text = t();
   const [sortKey, setSortKey] = useState<SortKey>("status");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -161,8 +163,8 @@ export default function Sites() {
   return (
     <div>
       <PageHeader
-        title="Sites"
-        description="Every monitored target with response time, certificate and uptime windows."
+        title={text.sites}
+        description={text.sitesDescription}
       />
 
       {loading ? (
@@ -171,19 +173,19 @@ export default function Sites() {
         <ErrorState message={error.message} onRetry={reload} />
       ) : rows.length === 0 ? (
         <EmptyState
-          title={search ? "No sites match your search" : "No sites configured"}
-          hint={search ? "Try a different query." : "Add sites in blip.config.yaml."}
+          title={search ? text.noSitesMatch : text.noSitesConfigured}
+          hint={search ? text.tryDifferentSearch : text.addSitesHint}
         />
       ) : (
         <Card className="overflow-hidden p-0">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <SortHeader label="Site" sortKey="name" active={sortKey} dir={sortDir} onSort={onSort} />
-                <SortHeader label="Group" sortKey="group" active={sortKey} dir={sortDir} onSort={onSort} />
-                <SortHeader label="Status" sortKey="status" active={sortKey} dir={sortDir} onSort={onSort} />
+                <SortHeader label={text.site} sortKey="name" active={sortKey} dir={sortDir} onSort={onSort} />
+                <SortHeader label={text.group} sortKey="group" active={sortKey} dir={sortDir} onSort={onSort} />
+                <SortHeader label={text.status} sortKey="status" active={sortKey} dir={sortDir} onSort={onSort} />
                 <SortHeader
-                  label="Response"
+                  label={text.responseTime}
                   sortKey="responseTime"
                   active={sortKey}
                   dir={sortDir}
@@ -191,7 +193,7 @@ export default function Sites() {
                   className="text-right [&>button]:justify-end [&>button]:w-full"
                 />
                 <SortHeader label="SSL" sortKey="ssl" active={sortKey} dir={sortDir} onSort={onSort} />
-                <SortHeader label="Domain" sortKey="domain" active={sortKey} dir={sortDir} onSort={onSort} />
+                <SortHeader label={text.domain} sortKey="domain" active={sortKey} dir={sortDir} onSort={onSort} />
                 <SortHeader label="24h" sortKey="uptime24h" active={sortKey} dir={sortDir} onSort={onSort} />
                 <SortHeader label="7d" sortKey="uptime7d" active={sortKey} dir={sortDir} onSort={onSort} />
                 <SortHeader label="30d" sortKey="uptime30d" active={sortKey} dir={sortDir} onSort={onSort} />
