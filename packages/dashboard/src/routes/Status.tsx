@@ -224,17 +224,6 @@ export default function Status({ groupId }: { groupId?: string }) {
                 </section>
               )}
 
-              {isXgs && incidentHistory.length > 0 && (
-                <section className="space-y-3">
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    {text.incidents}
-                  </h2>
-                  {incidentHistory.map((incident) => (
-                    <IncidentRow key={incident.id} incident={incident} hideSite />
-                  ))}
-                </section>
-              )}
-
               {/* Components by group */}
               {sections.length === 0 ? (
                 <EmptyState title={text.noPublicComponents} hint={text.nothingPublished} />
@@ -242,6 +231,17 @@ export default function Status({ groupId }: { groupId?: string }) {
                 <section className="space-y-5">
                   {sections.map((s, i) => (
                     <GroupSection key={s.group?.id ?? `ungrouped-${i}`} group={s.group} sites={s.sites} />
+                  ))}
+                </section>
+              )}
+
+              {isXgs && incidentHistory.length > 0 && (
+                <section className="space-y-3">
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    {text.incidents}
+                  </h2>
+                  {incidentHistory.map((incident) => (
+                    <IncidentRow key={incident.id} incident={incident} hideSite />
                   ))}
                 </section>
               )}
