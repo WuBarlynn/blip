@@ -84,6 +84,18 @@ const TEXT = {
     notificationChannels: "Notification channels",
     rolesAccess: "Roles & access",
     sourceDocs: "Source & docs",
+    configurationHint: "Configuration is edited in the repository (blip.config.yaml), not here. Commit a change and the next monitoring run picks it up.",
+    channelsDescription: "Supported alert channels. Tokens and webhook URLs live only in repo secrets and are never shown in the dashboard.",
+    accessDescription: (label: string, role: string, scope: string) => `You are signed in as ${label} with the ${role} role. Your scope is ${scope}. Access is configured in blip.config.yaml under access.principals, with passwords stored as Cloudflare Worker secrets. The Worker enforces access at the edge and filters all data server-side — the roles below only shape what the UI reveals.`,
+    you: "You",
+    documentationHint: "Edit docs/configuration.md for the full reference.",
+    roleLabels: { SUPER_ADMIN: "Super admin", ADMIN: "Admin", CLIENT: "Client", VIEWER: "Viewer" },
+    roleDescriptions: {
+      SUPER_ADMIN: "Full access to every site, group, and configuration surface.",
+      ADMIN: "Full read access to all sites and groups across the workspace.",
+      CLIENT: "Scoped to their own groups/sites — sees only their tenant's status.",
+      VIEWER: "Read-only access to the sites and groups they are granted.",
+    },
   },
   zh: {
     overview: "概览",
@@ -164,6 +176,18 @@ const TEXT = {
     notificationChannels: "通知渠道",
     rolesAccess: "角色与访问权限",
     sourceDocs: "源码与文档",
+    configurationHint: "配置在仓库中的 blip.config.yaml 内编辑，不在此页面修改。提交变更后，下一次监控运行会自动加载。",
+    channelsDescription: "支持的告警渠道。Token 和 Webhook 地址仅保存在仓库密钥中，绝不会显示在仪表盘。",
+    accessDescription: (label: string, role: string, scope: string) => `你当前以 ${label} 身份登录，角色为${role}。你的访问范围是${scope}。访问权限在 blip.config.yaml 的 access.principals 中配置，密码存储为 Cloudflare Worker 密钥。Worker 会在边缘执行权限控制并在服务端筛选所有数据；下方角色仅用于说明界面可见内容。`,
+    you: "当前角色",
+    documentationHint: "完整参考请编辑 docs/configuration.md。",
+    roleLabels: { SUPER_ADMIN: "超级管理员", ADMIN: "管理员", CLIENT: "客户", VIEWER: "查看者" },
+    roleDescriptions: {
+      SUPER_ADMIN: "可完全访问所有站点、分组和配置功能。",
+      ADMIN: "可读取工作区内所有站点和分组。",
+      CLIENT: "仅能查看被分配的分组或站点。",
+      VIEWER: "对被授予的站点和分组拥有只读权限。",
+    },
   },
 } as const;
 

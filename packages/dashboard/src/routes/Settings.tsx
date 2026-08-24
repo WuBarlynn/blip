@@ -19,7 +19,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth, ROLE_LABEL, ROLE_DESCRIPTION } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -94,9 +94,7 @@ export default function Settings() {
 
       <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
         <Info className="-mt-0.5 mr-1.5 inline size-4" />
-        Configuration is edited in the repository (
-        <code className="rounded bg-background px-1 py-0.5 text-xs">blip.config.yaml</code>), not
-        here. Commit a change and the next monitoring run picks it up.
+        {text.configurationHint}
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -152,10 +150,7 @@ export default function Settings() {
             <CardTitle>{text.notificationChannels}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <CardDescription>
-              Supported alert channels. Tokens and webhook URLs live only in repo secrets and are
-              never shown in the dashboard.
-            </CardDescription>
+            <CardDescription>{text.channelsDescription}</CardDescription>
             <ul className="flex flex-wrap gap-2">
               {channels.map((c) => {
                 const Icon = CHANNEL_ICON[c.type];
@@ -180,22 +175,11 @@ export default function Settings() {
           </CardHeader>
           <CardContent className="space-y-4">
             <CardDescription>
-              You are signed in as{" "}
-              <span className="font-medium text-foreground">{auth.label ?? "a user"}</span>
-              {auth.role && (
-                <>
-                  {" "}
-                  with the{" "}
-                  <span className="font-medium text-foreground">{ROLE_LABEL[auth.role]}</span> role
-                </>
+              {text.accessDescription(
+                auth.label ?? "—",
+                auth.role ? text.roleLabels[auth.role] : "—",
+                scopeSummary,
               )}
-              . Your scope is{" "}
-              <span className="font-medium text-foreground">{scopeSummary}</span>. Access is
-              configured in{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">blip.config.yaml</code> under{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">access.principals</code>, with
-              passwords stored as Cloudflare Worker secrets. The Worker enforces access at the edge
-              and filters all data server-side — the roles below only shape what the UI reveals.
             </CardDescription>
             <ul className="grid gap-3 sm:grid-cols-2">
               {ROLES.map((r) => (
@@ -207,14 +191,14 @@ export default function Settings() {
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{ROLE_LABEL[r]}</span>
+                    <span className="font-medium">{text.roleLabels[r]}</span>
                     {r === auth.role && (
                       <Badge variant="default" className="px-1.5 py-0 text-[10px]">
-                        You
+                        {text.you}
                       </Badge>
                     )}
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground">{ROLE_DESCRIPTION[r]}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{text.roleDescriptions[r]}</p>
                 </li>
               ))}
             </ul>
@@ -229,13 +213,10 @@ export default function Settings() {
           rel="noreferrer"
           className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 font-medium hover:bg-accent"
         >
-          <Github className="size-4" /> Source &amp; docs
+          <Github className="size-4" /> {text.sourceDocs}
           <ExternalLink className="size-3.5 opacity-60" />
         </a>
-        <span className="text-muted-foreground">
-          Edit <code className="rounded bg-muted px-1 py-0.5 text-xs">docs/configuration.md</code>{" "}
-          for the full reference.
-        </span>
+        <span className="text-muted-foreground">{text.documentationHint}</span>
       </div>
     </div>
   );
