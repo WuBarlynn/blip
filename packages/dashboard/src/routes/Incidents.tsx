@@ -9,6 +9,7 @@ import { IncidentRow } from "@/components/IncidentRow";
 import { EmptyState, ErrorState, TableSkeleton } from "@/components/States";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLayoutSearch } from "@/components/AppLayout";
+import { t } from "@/lib/i18n";
 
 type Filter = "all" | "open" | "resolved";
 
@@ -18,6 +19,7 @@ export default function Incidents() {
   const auth = useAuth();
   const search = useLayoutSearch();
   const [filter, setFilter] = useState<Filter>("all");
+  const text = t();
 
   useBrand(summary?.brand);
 
@@ -55,16 +57,16 @@ export default function Incidents() {
   return (
     <div>
       <PageHeader
-        title="Incidents"
-        description="Outages, degradations and certificate alerts across your fleet."
+        title={text.incidents}
+        description={text.incidentDescription}
         actions={
           <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="all">{text.all}</TabsTrigger>
               <TabsTrigger value="open">
-                Open{openCount > 0 ? ` (${openCount})` : ""}
+                {text.open}{openCount > 0 ? ` (${openCount})` : ""}
               </TabsTrigger>
-              <TabsTrigger value="resolved">Resolved</TabsTrigger>
+              <TabsTrigger value="resolved">{text.resolved}</TabsTrigger>
             </TabsList>
           </Tabs>
         }
@@ -79,12 +81,12 @@ export default function Incidents() {
           icon={<CheckCircle2 className="size-5 text-up" />}
           title={
             filter === "open"
-              ? "No open incidents"
+              ? text.noOpenIncidents
               : search
-                ? "No incidents match your search"
-                : "No incidents recorded"
+                ? text.noIncidentsMatch
+                : text.noIncidentsRecorded
           }
-          hint="When a check fails, an incident is opened automatically and shown here."
+          hint={text.incidentEmptyHint}
         />
       ) : (
         <div className="space-y-3">

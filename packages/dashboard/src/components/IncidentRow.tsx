@@ -10,6 +10,7 @@ import {
   INCIDENT_TYPE_LABEL,
   INCIDENT_TYPE_TONE,
 } from "@/lib/format";
+import { t } from "@/lib/i18n";
 
 interface IncidentRowProps {
   incident: Incident;
@@ -22,6 +23,7 @@ export function IncidentRow({ incident, hideSite = false }: IncidentRowProps) {
   const open = incident.state === "open";
   const tone = INCIDENT_TYPE_TONE[incident.type] ?? "bg-muted text-muted-foreground";
   const label = INCIDENT_TYPE_LABEL[incident.type] ?? incident.type;
+  const text = t();
 
   return (
     <Card className={cn(open && "border-down/40 bg-down-soft/30")}>
@@ -38,11 +40,11 @@ export function IncidentRow({ incident, hideSite = false }: IncidentRowProps) {
             </span>
             {open ? (
               <span className="rounded-full bg-down px-2 py-0.5 text-xs font-medium text-white">
-                Ongoing
+                {text.ongoing}
               </span>
             ) : (
               <span className="rounded-full bg-up-soft px-2 py-0.5 text-xs font-medium text-up">
-                Resolved
+                {text.resolved}
               </span>
             )}
             {!hideSite && (
@@ -73,12 +75,12 @@ export function IncidentRow({ incident, hideSite = false }: IncidentRowProps) {
           )}
 
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span>Started {dateTime(incident.startedAt)}</span>
-            {incident.resolvedAt && <span>Resolved {dateTime(incident.resolvedAt)}</span>}
+            <span>{text.started} {dateTime(incident.startedAt)}</span>
+            {incident.resolvedAt && <span>{text.resolvedAt} {dateTime(incident.resolvedAt)}</span>}
             <span className="font-medium text-foreground">
               {open
-                ? `Ongoing for ${durationLabel(Date.now() - new Date(incident.startedAt).getTime())}`
-                : `Lasted ${durationLabel(incident.durationMs)}`}
+                ? text.ongoingFor(durationLabel(Date.now() - new Date(incident.startedAt).getTime()))
+                : text.lasted(durationLabel(incident.durationMs))}
             </span>
           </div>
         </div>

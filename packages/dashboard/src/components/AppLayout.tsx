@@ -50,7 +50,7 @@ export function useLayoutSearch(): string {
 
 function NavItems({ onNavigate }: { onNavigate?: () => void }) {
   const { authenticated } = useAuth();
-  const [statusOpen, setStatusOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(true);
   const text = t();
   const labels: Record<string, string> = {
     "/": text.overview,
@@ -95,6 +95,7 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
 
 function UserChip() {
   const auth = useAuth();
+  const text = t();
   // Anonymous viewer on a public dashboard — offer an admin sign-in entry point.
   if (!auth.authenticated) {
     return (
@@ -106,13 +107,13 @@ function UserChip() {
           <LogIn className="size-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium">Public demo</p>
-          <p className="truncate text-[10px] text-muted-foreground">Admin sign in →</p>
+          <p className="truncate text-xs font-medium">{text.publicDemo}</p>
+          <p className="truncate text-[10px] text-muted-foreground">{text.adminSignIn}</p>
         </div>
       </NavLink>
     );
   }
-  const label = auth.label ?? "Signed-in user";
+  const label = auth.label ?? text.signedInUser;
   const initial = (label[0] ?? "P").toUpperCase();
   return (
     <div className="flex items-center gap-2.5 rounded-lg border border-border bg-card px-2.5 py-2">
@@ -132,8 +133,8 @@ function UserChip() {
         size="icon"
         className="size-7 shrink-0 text-muted-foreground hover:text-foreground"
         onClick={() => void auth.logout()}
-        aria-label="Log out"
-        title="Log out"
+        aria-label={text.logOut}
+        title={text.logOut}
       >
         <LogOut className="size-4" />
       </Button>
