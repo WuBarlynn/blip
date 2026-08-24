@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { GroupSummary, SiteSummary } from "@blip/shared";
 import { overallStatus } from "@blip/shared";
-import { ExternalLink, Heart, LogIn, LogOut } from "lucide-react";
+import { ChevronDown, ExternalLink, Heart, LogIn, LogOut } from "lucide-react";
 import { useSummary } from "@/lib/data";
 import { useAuth } from "@/lib/auth";
 import { useBrand } from "@/components/BrandProvider";
@@ -80,6 +80,7 @@ export default function Status({ groupId }: { groupId?: string }) {
   const { data, error, loading, reload, unauthorized } = useSummary();
   const auth = useAuth();
   const [showLogin, setShowLogin] = useState(false);
+  const [incidentDays, setIncidentDays] = useState(3);
   const text = t();
   useBrand(data?.brand);
 
@@ -123,9 +124,19 @@ export default function Status({ groupId }: { groupId?: string }) {
   );
 
   const incidentHistory = useMemo(
-    () => incidents.filter((incident) => incident.state !== "open"),
+    () =>
+      incidents
+        .filter((incident) => incident.state !== "open")
+        .sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt)),
     [incidents],
   );
+
+  const visibleIncidentHistory = useMemo(() => {
+    const since = Date.now() - incidentDays * 24 * 60 * 60 * 1000;
+    return incidentHistory.filter((incident) => Date.parse(incident.startedAt) >= since);
+  }, [incidentHistory, incidentDays]);
+
+  const hasOlderIncidentHistory = visibleIncidentHistory.length < incidentHistory.length;
 
   const brand = data?.brand;
   const isXgs = groupId === "xgs";
@@ -240,9 +251,18 @@ export default function Status({ groupId }: { groupId?: string }) {
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                     {text.incidents}
                   </h2>
-                  {incidentHistory.map((incident) => (
+                  {visibleIncidentHistory.map((incident) => (
                     <IncidentRow key={incident.id} incident={incident} hideSite />
                   ))}
+                  {hasOlderIncidentHistory && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setIncidentDays((days) => days + 3)}
+                    >
+                      <ChevronDown className="size-4" /> 加载更早事件
+                    </Button>
+                  )}
                 </section>
               )}
 
