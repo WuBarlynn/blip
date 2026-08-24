@@ -123,8 +123,8 @@ export default function Status({ groupId }: { groupId?: string }) {
   const brand = data?.brand;
   const isXgs = groupId === "xgs";
   const brandName = isXgs ? text.xgsStatus : brand?.name?.trim() || "Blip";
-  const pageTitle = isXgs ? text.xgsStatus : `${brandName}${text.status}`;
-  const tagline = isXgs ? undefined : brand?.tagline;
+  const pageTitle = isXgs ? text.xgsStatus : "WuBarlynn 服务状态";
+  const tagline = undefined;
 
   // The Worker returned 401 for /data/summary.json (status page not public and
   // viewer not logged in) or the viewer asked to sign in → show the login card.
