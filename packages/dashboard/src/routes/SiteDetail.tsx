@@ -39,6 +39,7 @@ import {
   expiryChip,
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 type Window = "24h" | "7d" | "30d";
 
@@ -116,6 +117,7 @@ export default function SiteDetail() {
   const { data: summary, loading: summaryLoading } = useSummary();
   const { data: history, loading: historyLoading, error: historyError, reload } = useHistory(id);
   const auth = useAuth();
+  const text = t();
   const [window, setWindow] = useState<Window>("24h");
 
   useBrand(summary?.brand);
@@ -145,10 +147,10 @@ export default function SiteDetail() {
       <div className="space-y-6">
         <Button asChild variant="ghost" size="sm">
           <Link to="/">
-            <ArrowLeft className="size-4" /> Back
+            <ArrowLeft className="size-4" /> {text.back}
           </Link>
         </Button>
-        <EmptyState title="Site not found" hint="It may have been removed from the config." />
+        <EmptyState title={text.siteNotFound} hint={text.siteNotFoundHint} />
       </div>
     );
   }
@@ -158,12 +160,12 @@ export default function SiteDetail() {
       <div className="space-y-6">
         <Button asChild variant="ghost" size="sm">
           <Link to="/">
-            <ArrowLeft className="size-4" /> Back
+            <ArrowLeft className="size-4" /> {text.back}
           </Link>
         </Button>
         <EmptyState
-          title="You don't have access to this site"
-          hint="It belongs to a group outside your scope."
+          title={text.siteAccessDenied}
+          hint={text.siteAccessDeniedHint}
         />
       </div>
     );
@@ -178,7 +180,7 @@ export default function SiteDetail() {
     <div className="space-y-6">
       <Button asChild variant="ghost" size="sm" className="-ml-2 w-fit">
         <Link to="/">
-          <ArrowLeft className="size-4" /> Overview
+          <ArrowLeft className="size-4" /> {text.overview}
         </Link>
       </Button>
 
@@ -210,30 +212,30 @@ export default function SiteDetail() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatPill
           icon={<Clock className="size-4" />}
-          label="Response"
+          label={text.siteResponseTime}
           value={responseMs(site.responseTime)}
         />
         <StatPill
           icon={<Gauge className="size-4" />}
-          label="Uptime 24h"
+          label={text.uptime24h}
           value={uptimePct(site.uptime24h)}
           tone={uptimeColor(site.uptime24h)}
         />
         <StatPill
           icon={<Gauge className="size-4" />}
-          label="Uptime 7d"
+          label={text.uptime7d}
           value={uptimePct(site.uptime7d)}
           tone={uptimeColor(site.uptime7d)}
         />
         <StatPill
           icon={<Gauge className="size-4" />}
-          label="Uptime 30d"
+          label={text.uptime30d}
           value={uptimePct(site.uptime30d)}
           tone={uptimeColor(site.uptime30d)}
         />
         <StatPill
           icon={<Gauge className="size-4" />}
-          label="Uptime 90d"
+          label={text.uptime90d}
           value={uptimePct(site.uptime90d)}
           tone={uptimeColor(site.uptime90d)}
         />
@@ -242,7 +244,7 @@ export default function SiteDetail() {
       {/* 90-day strip */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle>Last 90 days</CardTitle>
+          <CardTitle>{text.last90Days}</CardTitle>
         </CardHeader>
         <CardContent>
           <UptimeBar
@@ -259,11 +261,11 @@ export default function SiteDetail() {
       {/* Tabs */}
       <Tabs defaultValue="response">
         <TabsList>
-          <TabsTrigger value="response">Response time</TabsTrigger>
-          <TabsTrigger value="uptime">Uptime</TabsTrigger>
-          <TabsTrigger value="ssl">SSL &amp; domain</TabsTrigger>
+          <TabsTrigger value="response">{text.siteResponseTime}</TabsTrigger>
+          <TabsTrigger value="uptime">{text.uptime}</TabsTrigger>
+          <TabsTrigger value="ssl">{text.sslDomain}</TabsTrigger>
           <TabsTrigger value="incidents">
-            Incidents
+            {text.incidents}
             {incidents.length > 0 && (
               <span className="ml-1 rounded-full bg-muted px-1.5 text-[10px]">
                 {incidents.length}
@@ -275,15 +277,15 @@ export default function SiteDetail() {
         <TabsContent value="response">
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0">
-              <CardTitle>Response time</CardTitle>
+              <CardTitle>{text.siteResponseTime}</CardTitle>
               <Select value={window} onValueChange={(v) => setWindow(v as Window)}>
                 <SelectTrigger className="w-28">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="24h">Last 24h</SelectItem>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
+                  <SelectItem value="24h">{text.last24h}</SelectItem>
+                  <SelectItem value="7d">{text.last7days}</SelectItem>
+                  <SelectItem value="30d">{text.last30days}</SelectItem>
                 </SelectContent>
               </Select>
             </CardHeader>
@@ -302,7 +304,7 @@ export default function SiteDetail() {
         <TabsContent value="uptime">
           <Card>
             <CardHeader>
-              <CardTitle>Daily uptime</CardTitle>
+              <CardTitle>{text.dailyUptime}</CardTitle>
             </CardHeader>
             <CardContent>
               {historyLoading ? (
@@ -317,42 +319,42 @@ export default function SiteDetail() {
         <TabsContent value="ssl">
           <div className="grid gap-4 sm:grid-cols-2">
             <ExpiryCard
-              title="TLS certificate"
+              title={text.tlsCertificate}
               icon={<ShieldCheck className="size-4" />}
               rows={
                 site.ssl
                   ? [
                       {
-                        label: "Expires",
+                        label: text.expires,
                         value: dateTime(site.ssl.validTo),
                       },
                       {
-                        label: "Remaining",
+                        label: text.remaining,
                         value: (
                           <span className={cn("rounded-full px-2 py-0.5", sslChip?.tone)}>
                             {sslChip?.label}
                           </span>
                         ),
                       },
-                      ...(site.ssl.issuer ? [{ label: "Issuer", value: site.ssl.issuer }] : []),
-                      ...(site.ssl.subject ? [{ label: "Subject", value: site.ssl.subject }] : []),
+                      ...(site.ssl.issuer ? [{ label: text.issuer, value: site.ssl.issuer }] : []),
+                      ...(site.ssl.subject ? [{ label: text.subject, value: site.ssl.subject }] : []),
                     ]
                   : null
               }
             />
             <ExpiryCard
-              title="Domain registration"
+              title={text.domainRegistration}
               icon={<Globe className="size-4" />}
               rows={
                 site.domain
                   ? [
-                      { label: "Expires", value: dateTime(site.domain.expiresAt) },
+                      { label: text.expires, value: dateTime(site.domain.expiresAt) },
                       {
-                        label: "Remaining",
-                        value: `${site.domain.daysRemaining} days`,
+                        label: text.remaining,
+                        value: text.daysRemaining(site.domain.daysRemaining),
                       },
                       ...(site.domain.registrar
-                        ? [{ label: "Registrar", value: site.domain.registrar }]
+                        ? [{ label: text.registrar, value: site.domain.registrar }]
                         : []),
                     ]
                   : null
@@ -363,7 +365,7 @@ export default function SiteDetail() {
 
         <TabsContent value="incidents">
           {incidents.length === 0 ? (
-            <EmptyState title="No incidents recorded" hint="This site has been healthy." />
+            <EmptyState title={text.noIncidentsRecorded} hint={text.noIncidentsHealthy} />
           ) : (
             <div className="space-y-3">
               {incidents.map((inc) => (
@@ -375,7 +377,7 @@ export default function SiteDetail() {
       </Tabs>
 
       <p className="text-xs text-muted-foreground">
-        Last checked {dateTime(site.lastChecked)} · {relativeTime(site.lastChecked)}
+        {text.lastChecked} {dateTime(site.lastChecked)} · {relativeTime(site.lastChecked)}
       </p>
     </div>
   );
