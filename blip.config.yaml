@@ -53,7 +53,7 @@ sites:
     description: Cloud Mail Worker.
 
   - name: XGS星光服
-    url: https://mcstatus-probe.wubarlynn.top/get_motd
+    url: https://mcstatus.xingguang.space/get_motd
     group: xgs
     public: true
     expectedStatus: 200
