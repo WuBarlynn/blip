@@ -52,6 +52,13 @@ sites:
     ssl: true
     description: Cloud Mail Worker.
 
+  - name: HA WBC
+    url: https://wbc.wubarlynn.top/
+    group: wubarlynn
+    public: true
+    ssl: true
+    description: HA-WBC-2开机卡.
+
   - name: XGS星光服
     url: https://mcstatus.xingguang.space/get_motd
     group: xgs
